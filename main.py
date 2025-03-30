@@ -11,9 +11,6 @@ from model import NERModelBuilder, PartialEvaluationMetrics
 def parse_args():
     parser = argparse.ArgumentParser(description="Train and evaluate NER models with partial evaluation metrics")
     
-    # Data options
-    parser.add_argument('--use_huggingface', action='store_true', help='Use HuggingFace datasets instead of local files')
-    
     # Model options
     parser.add_argument('--model_type', choices=['classic', 'transformer'], default='classic',
                         help='Type of model to use: classic (Flair+GloVe) or transformer')
@@ -47,7 +44,13 @@ def main():
     os.makedirs(args.output_dir, exist_ok=True)
     
     print("Loading corpus...")
-    corpus = prepare_corpus(args.use_huggingface)
+    corpus = prepare_corpus(
+        data_dir='dataset',  
+        train_file='btc.train',
+        dev_file='btc.dev',
+        test_file='btc.test',
+        label_type='ner'
+    )
     print(corpus)
     
     tag_type = 'ner'
