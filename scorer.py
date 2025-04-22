@@ -2,6 +2,10 @@ from flair.data import Label
 from typing_extensions import NamedTuple
 from typing import Sequence, Dict, Tuple, List, Set, Optional
 
+# for testing purposes
+from flair.data import Sentence
+from flair.nn import Classifier
+
 # this is from COSI 216A HW1
 class Mention(NamedTuple):
     """
@@ -255,3 +259,16 @@ class Scorer:
             end = label.unlabeled_identifier.split(":")[1].split("]")[0]
             mentions.append(Mention(entity_type, start, end))
         return mentions
+    
+
+if __name__ == "__main__":
+    # simple test case
+    sentence = Sentence('George Washington went to Washington.')
+
+    tagger = Classifier.load('ner-fast')
+
+    tagger.predict(sentence)
+
+    print(sentence)
+
+    print(Scorer.create_mentions(sentence.get_labels()))
