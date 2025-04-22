@@ -1,6 +1,6 @@
 from flair.data import Label
 from typing_extensions import NamedTuple
-from typing import Sequence
+from typing import Sequence, Dict, Tuple, List, Set, Optional
 
 # this is from COSI 216A HW1
 class Mention(NamedTuple):
@@ -21,6 +21,79 @@ class Scorer:
         self.true_positives = len(reference_set & predictions_set)
         self.false_positives = len(predictions_set - reference_set)
         self.false_negatives = len(reference_set - predictions_set)
+        
+        # Store raw mentions for partial matching
+        self.reference = list(reference)
+        self.predictions = list(predictions)
+        
+        self.left_match_tp = 0
+        self.right_match_tp = 0
+        self.partial_match_tp = 0
+        self.type_match_tp = 0
+        self.overlap_scores = 0.0
+        
+        self._compute_partial_matches()
+        
+    def _compute_partial_matches(self) -> None:
+        """
+        Compute all the partial match metrics between reference and predictions.
+        """
+        # Track which references have been matched to avoid double counting
+        matched_refs: Dict[int, Set[str]] = {i: set() for i in range(len(self.reference))}
+        
+        for pred in self.predictions:
+            best_overlap = 0
+            best_ref_idx = -1
+            
+            # Find the best matching reference for this prediction
+            for i, ref in enumerate(self.reference):
+                # Skip if entity types don't match and we're not doing type-relaxed matching
+                if pred.entity_type != ref.entity_type:
+                    continue
+                    
+                # Check left boundary match
+                if int(pred.start) == int(ref.start):
+                    if 'left' not in matched_refs[i]:
+                        self.left_match_tp += 1
+                        matched_refs[i].add('left')
+                
+                # Check right boundary match
+                if int(pred.end) == int(ref.end):
+                    if 'right' not in matched_refs[i]:
+                        self.right_match_tp += 1
+                        matched_refs[i].add('right')
+                
+                # Check for any overlap between the spans
+                if max(int(pred.start), int(ref.start)) < min(int(pred.end), int(ref.end)):
+                    if 'partial' not in matched_refs[i]:
+                        self.partial_match_tp += 1
+                        matched_refs[i].add('partial')
+                    
+                    # Calculate overlap percentage
+                    overlap_start = max(int(pred.start), int(ref.start))
+                    overlap_end = min(int(pred.end), int(ref.end))
+                    overlap_length = overlap_end - overlap_start
+                    
+                    union_length = max(int(pred.end), int(ref.end)) - min(int(pred.start), int(ref.start))
+                    overlap_ratio = overlap_length / union_length
+                    
+                    # Track the best overlap for this prediction
+                    if overlap_ratio > best_overlap:
+                        best_overlap = overlap_ratio
+                        best_ref_idx = i
+            
+            # Add the best overlap score if there was a match
+            if best_ref_idx >= 0 and 'overlap' not in matched_refs[best_ref_idx]:
+                self.overlap_scores += best_overlap
+                matched_refs[best_ref_idx].add('overlap')
+        
+        # Count type matches (same entity type, regardless of spans)
+        pred_types = {p.entity_type for p in self.predictions}
+        ref_types = {r.entity_type for r in self.reference}
+        
+        for pred_type in pred_types:
+            if pred_type in ref_types:
+                self.type_match_tp += 1
 
     def precision(self) -> float:
         """
@@ -45,15 +118,128 @@ class Scorer:
         if self.precision() + self.recall() == 0:
             return 0.0
         return (2 * self.precision() * self.recall()) / (self.precision() + self.recall())
+    
+    def left_match_precision(self) -> float:
+        """
+        Precision for left boundary matches.
+        """
+        if len(self.predictions) == 0:
+            return 0.0
+        return self.left_match_tp / len(self.predictions)
+    
+    def left_match_recall(self) -> float:
+        """
+        Recall for left boundary matches.
+        """
+        if len(self.reference) == 0:
+            return 0.0
+        return self.left_match_tp / len(self.reference)
+    
+    def left_match_f1(self) -> float:
+        """
+        F1 score for left boundary matches.
+        """
+        precision = self.left_match_precision()
+        recall = self.left_match_recall()
+        if precision + recall == 0:
+            return 0.0
+        return (2 * precision * recall) / (precision + recall)
+    
+    def right_match_precision(self) -> float:
+        """
+        Precision for right boundary matches.
+        """
+        if len(self.predictions) == 0:
+            return 0.0
+        return self.right_match_tp / len(self.predictions)
+    
+    def right_match_recall(self) -> float:
+        """
+        Recall for right boundary matches.
+        """
+        if len(self.reference) == 0:
+            return 0.0
+        return self.right_match_tp / len(self.reference)
+    
+    def right_match_f1(self) -> float:
+        """
+        F1 score for right boundary matches.
+        """
+        precision = self.right_match_precision()
+        recall = self.right_match_recall()
+        if precision + recall == 0:
+            return 0.0
+        return (2 * precision * recall) / (precision + recall)
+    
+    def partial_match_precision(self) -> float:
+        """
+        Precision for partial span overlap.
+        """
+        if len(self.predictions) == 0:
+            return 0.0
+        return self.partial_match_tp / len(self.predictions)
+    
+    def partial_match_recall(self) -> float:
+        """
+        Recall for partial span overlap.
+        """
+        if len(self.reference) == 0:
+            return 0.0
+        return self.partial_match_tp / len(self.reference)
+    
+    def partial_match_f1(self) -> float:
+        """
+        F1 score for partial span overlap.
+        """
+        precision = self.partial_match_precision()
+        recall = self.partial_match_recall()
+        if precision + recall == 0:
+            return 0.0
+        return (2 * precision * recall) / (precision + recall)
+    
+    def overlap_precision(self) -> float:
+        """
+        Weighted precision based on overlap percentage.
+        """
+        if len(self.predictions) == 0:
+            return 0.0
+        return self.overlap_scores / len(self.predictions)
+    
+    def overlap_recall(self) -> float:
+        """
+        Weighted recall based on overlap percentage.
+        """
+        if len(self.reference) == 0:
+            return 0.0
+        return self.overlap_scores / len(self.reference)
+    
+    def overlap_f1(self) -> float:
+        """
+        F1 score weighted by overlap percentage.
+        """
+        precision = self.overlap_precision()
+        recall = self.overlap_recall()
+        if precision + recall == 0:
+            return 0.0
+        return (2 * precision * recall) / (precision + recall)
 
     def merge(self, other_scorer: "Scorer") -> None:
         """
         Adds the other Scorer's counts to this one.
         """
-        # TODO bad practice to modify these directly?
         self.true_positives += other_scorer.true_positives
         self.false_positives += other_scorer.false_positives
         self.false_negatives += other_scorer.false_negatives
+        
+        self.left_match_tp += other_scorer.left_match_tp
+        self.right_match_tp += other_scorer.right_match_tp
+        self.partial_match_tp += other_scorer.partial_match_tp
+        self.type_match_tp += other_scorer.type_match_tp
+        self.overlap_scores += other_scorer.overlap_scores
+        
+        # Append the raw mentions for potential recomputation
+        self.reference.extend(other_scorer.reference)
+        self.predictions.extend(other_scorer.predictions)
 
 
     @staticmethod

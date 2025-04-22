@@ -50,7 +50,9 @@ trainer = ModelTrainer(tagger, corpus)
 
 model = SequenceTagger.load(os.path.join('resources', 'taggers', 'sota-ner-flair', 'final-model.pt'))
 
-model.evaluate(data_points=corpus.dev, gold_label_type='ner', gold_label_dictionary=label_dict)
+result = model.evaluate(data_points=corpus.dev, gold_label_type='ner', gold_label_dictionary=label_dict)
+
+print("Flair built-in F1:", result.main_score)
 
 scores = Scorer([], [])
 for i, sentence in tqdm(enumerate(corpus.dev), total=len(corpus.dev)):
@@ -60,4 +62,20 @@ for i, sentence in tqdm(enumerate(corpus.dev), total=len(corpus.dev)):
     predictions = Scorer.create_mentions(unlabeled.get_labels())
     scores.merge(Scorer(reference, predictions))
 
-print("F1:", scores.f1_score())
+print("\n===== NER Evaluation Results =====")
+print("Exact Match Metrics (Traditional):")
+print(f"Custom Scorer F1: {scores.f1_score():.4f}")
+print(f"Precision: {scores.precision():.4f}")
+print(f"Recall: {scores.recall():.4f}")
+
+print("\nPartial Match Metrics:")
+print(f"Left Boundary Match F1: {scores.left_match_f1():.4f}")
+print(f"Right Boundary Match F1: {scores.right_match_f1():.4f}")
+print(f"Partial Overlap F1: {scores.partial_match_f1():.4f}")
+print(f"Overlap Percentage F1: {scores.overlap_f1():.4f}")
+
+print("\nDetailed Partial Match Metrics:")
+print(f"Left Match - Precision: {scores.left_match_precision():.4f}, Recall: {scores.left_match_recall():.4f}")
+print(f"Right Match - Precision: {scores.right_match_precision():.4f}, Recall: {scores.right_match_recall():.4f}")
+print(f"Partial Match - Precision: {scores.partial_match_precision():.4f}, Recall: {scores.partial_match_recall():.4f}")
+print(f"Overlap - Precision: {scores.overlap_precision():.4f}, Recall: {scores.overlap_recall():.4f}")
