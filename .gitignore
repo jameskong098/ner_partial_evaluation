@@ -1,5 +1,7 @@
 # Custom
 .DS_Store
+*.pt
+*.tsv
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -175,3 +177,6 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# model is large, doesn't upload to github well
+resources/
