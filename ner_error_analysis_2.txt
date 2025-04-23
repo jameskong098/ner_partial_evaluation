@@ -1,0 +1,693 @@
+=== NER Partial Match Error Analysis ===
+
+Sentence 0: RT @ SportsCenter : 76ers to retire Allen Iverson 's jersey tonight at halftime vs Wizards . Julius Erving , Moses Malone & Dikembe Mutombo are …
+--------------------------------------------------------------------------------
+GOLD MENTIONS:
+Mention object: [Mention(entity_type='ORG', start='1', end='2', text='@'), Mention(entity_type='ORG', start='2', end='3', text='SportsCenter'), Mention(entity_type='ORG', start='4', end='5', text='76ers'), Mention(entity_type='PER', start='7', end='9', text='Allen Iverson'), Mention(entity_type='ORG', start='15', end='16', text='Wizards'), Mention(entity_type='PER', start='17', end='19', text='Julius Erving'), Mention(entity_type='PER', start='20', end='22', text='Moses Malone'), Mention(entity_type='PER', start='23', end='25', text='Dikembe Mutombo')]
+  - "@" [ORG] (1:2)
+  - "SportsCenter" [ORG] (2:3)
+  - "76ers" [ORG] (4:5)
+  - "Allen Iverson" [PER] (7:9)
+  - "Wizards" [ORG] (15:16)
+  - "Julius Erving" [PER] (17:19)
+  - "Moses Malone" [PER] (20:22)
+  - "Dikembe Mutombo" [PER] (23:25)
+
+PREDICTIONS:
+  - "@" [ORG] (1:2)
+  - "SportsCenter" [ORG] (2:3)
+  - "76ers" [ORG] (4:5)
+  - "Allen Iverson" [PER] (7:9)
+  - "halftime" [ORG] (14:15)
+  - "Wizards" [ORG] (16:17)
+  - "Julius Erving" [PER] (18:20)
+  - "Moses Malone" [PER] (21:23)
+  - "Dikembe Mutombo" [PER] (24:26)
+
+PARTIAL MATCH METRICS:
+Exact Match F1: 0.4706
+Left Boundary Match F1: 0.4706
+Right Boundary Match F1: 0.4706
+Partial Overlap F1: 0.8235
+Overlap Percentage F1: 0.5882
+
+DETAILED ANALYSIS:
+
+  Gold: "@" [ORG] vs Pred: "@" [ORG]
+  Overlap: "T" (1 chars)
+  Overlap covers 100.0% of gold and 100.0% of prediction
+  LEFT BOUNDARY MATCH: Yes
+  RIGHT BOUNDARY MATCH: Yes
+
+  Gold: "SportsCenter" [ORG] vs Pred: "SportsCenter" [ORG]
+  Overlap: " " (1 chars)
+  Overlap covers 100.0% of gold and 100.0% of prediction
+  LEFT BOUNDARY MATCH: Yes
+  RIGHT BOUNDARY MATCH: Yes
+
+  Gold: "76ers" [ORG] vs Pred: "76ers" [ORG]
+  Overlap: " " (1 chars)
+  Overlap covers 100.0% of gold and 100.0% of prediction
+  LEFT BOUNDARY MATCH: Yes
+  RIGHT BOUNDARY MATCH: Yes
+
+  Gold: "Allen Iverson" [PER] vs Pred: "Allen Iverson" [PER]
+  Overlap: "or" (2 chars)
+  Overlap covers 100.0% of gold and 100.0% of prediction
+  LEFT BOUNDARY MATCH: Yes
+  RIGHT BOUNDARY MATCH: Yes
+
+  Gold: "Julius Erving" [PER] vs Pred: "Julius Erving" [PER]
+  Overlap: ":" (1 chars)
+  Overlap covers 50.0% of gold and 50.0% of prediction
+  LEFT BOUNDARY MISMATCH: Gold=17, Pred=18, Offset=1
+  RIGHT BOUNDARY MISMATCH: Gold=19, Pred=20, Offset=1
+
+  Gold: "Moses Malone" [PER] vs Pred: "Moses Malone" [PER]
+  Overlap: "6" (1 chars)
+  Overlap covers 50.0% of gold and 50.0% of prediction
+  LEFT BOUNDARY MISMATCH: Gold=20, Pred=21, Offset=1
+  RIGHT BOUNDARY MISMATCH: Gold=22, Pred=23, Offset=1
+
+  Gold: "Dikembe Mutombo" [PER] vs Pred: "Dikembe Mutombo" [PER]
+  Overlap: "s" (1 chars)
+  Overlap covers 50.0% of gold and 50.0% of prediction
+  LEFT BOUNDARY MISMATCH: Gold=23, Pred=24, Offset=1
+  RIGHT BOUNDARY MISMATCH: Gold=25, Pred=26, Offset=1
+
+================================================================================
+
+Sentence 3: Nigga u the older version of him “ @ NikoWavy : Why y ' all clown Terio on here ? He 's just a kid . . . ”
+--------------------------------------------------------------------------------
+GOLD MENTIONS:
+Mention object: [Mention(entity_type='PER', start='8', end='9', text='@'), Mention(entity_type='PER', start='9', end='10', text='NikoWavy'), Mention(entity_type='PER', start='16', end='17', text='Terio')]
+  - "@" [PER] (8:9)
+  - "NikoWavy" [PER] (9:10)
+  - "Terio" [PER] (16:17)
+
+PREDICTIONS:
+  - "NikoWavy" [PER] (9:10)
+
+PARTIAL MATCH METRICS:
+Exact Match F1: 0.5000
+Left Boundary Match F1: 0.5000
+Right Boundary Match F1: 0.5000
+Partial Overlap F1: 0.5000
+Overlap Percentage F1: 0.5000
+
+DETAILED ANALYSIS:
+
+  Gold: "NikoWavy" [PER] vs Pred: "NikoWavy" [PER]
+  Overlap: "h" (1 chars)
+  Overlap covers 100.0% of gold and 100.0% of prediction
+  LEFT BOUNDARY MATCH: Yes
+  RIGHT BOUNDARY MATCH: Yes
+
+================================================================================
+
+Sentence 4: RT @ david_myers77 : " Idk I 'm seepin " @ TheNickSavoia
+--------------------------------------------------------------------------------
+GOLD MENTIONS:
+Mention object: [Mention(entity_type='PER', start='1', end='2', text='@'), Mention(entity_type='PER', start='2', end='3', text='david_myers77'), Mention(entity_type='PER', start='10', end='11', text='@'), Mention(entity_type='PER', start='11', end='12', text='TheNickSavoia')]
+  - "@" [PER] (1:2)
+  - "david_myers77" [PER] (2:3)
+  - "@" [PER] (10:11)
+  - "TheNickSavoia" [PER] (11:12)
+
+PREDICTIONS:
+  - "@" [PER] (1:2)
+  - "david" [PER] (2:3)
+  - "TheNickSavoia" [PER] (14:15)
+
+PARTIAL MATCH METRICS:
+Exact Match F1: 0.2857
+Left Boundary Match F1: 0.5714
+Right Boundary Match F1: 0.5714
+Partial Overlap F1: 0.5714
+Overlap Percentage F1: 0.5714
+
+DETAILED ANALYSIS:
+
+  Gold: "@" [PER] vs Pred: "@" [PER]
+  Overlap: "T" (1 chars)
+  Overlap covers 100.0% of gold and 100.0% of prediction
+  LEFT BOUNDARY MATCH: Yes
+  RIGHT BOUNDARY MATCH: Yes
+
+  Gold: "david_myers77" [PER] vs Pred: "david" [PER]
+  Overlap: " " (1 chars)
+  Overlap covers 100.0% of gold and 100.0% of prediction
+  LEFT BOUNDARY MATCH: Yes
+  RIGHT BOUNDARY MATCH: Yes
+
+================================================================================
+
+Sentence 16: RT @ LaLaDessie : “ @ SoDamnReaI : When no one snapchats you back http://t.co/AZWh6JpyfO ”
+--------------------------------------------------------------------------------
+GOLD MENTIONS:
+Mention object: [Mention(entity_type='PER', start='1', end='2', text='@'), Mention(entity_type='PER', start='2', end='3', text='LaLaDessie'), Mention(entity_type='PER', start='5', end='6', text='@'), Mention(entity_type='PER', start='6', end='7', text='SoDamnReaI'), Mention(entity_type='ORG', start='11', end='12', text='snapchats')]
+  - "@" [PER] (1:2)
+  - "LaLaDessie" [PER] (2:3)
+  - "@" [PER] (5:6)
+  - "SoDamnReaI" [PER] (6:7)
+  - "snapchats" [ORG] (11:12)
+
+PREDICTIONS:
+  - "@" [PER] (1:2)
+  - "LaLaDessie" [PER] (2:3)
+  - "SoDamnReaI" [PER] (6:7)
+
+PARTIAL MATCH METRICS:
+Exact Match F1: 0.7500
+Left Boundary Match F1: 0.7500
+Right Boundary Match F1: 0.7500
+Partial Overlap F1: 0.7500
+Overlap Percentage F1: 0.7500
+
+DETAILED ANALYSIS:
+
+  Gold: "@" [PER] vs Pred: "@" [PER]
+  Overlap: "T" (1 chars)
+  Overlap covers 100.0% of gold and 100.0% of prediction
+  LEFT BOUNDARY MATCH: Yes
+  RIGHT BOUNDARY MATCH: Yes
+
+  Gold: "LaLaDessie" [PER] vs Pred: "LaLaDessie" [PER]
+  Overlap: " " (1 chars)
+  Overlap covers 100.0% of gold and 100.0% of prediction
+  LEFT BOUNDARY MATCH: Yes
+  RIGHT BOUNDARY MATCH: Yes
+
+  Gold: "SoDamnReaI" [PER] vs Pred: "SoDamnReaI" [PER]
+  Overlap: "a" (1 chars)
+  Overlap covers 100.0% of gold and 100.0% of prediction
+  LEFT BOUNDARY MATCH: Yes
+  RIGHT BOUNDARY MATCH: Yes
+
+================================================================================
+
+Sentence 19: Justin I 'm waiting for so long , please make my dream come true , follow me , and my friend @ shafeeva1 please ily @ justinbieber 61
+--------------------------------------------------------------------------------
+GOLD MENTIONS:
+Mention object: [Mention(entity_type='PER', start='0', end='1', text='Justin'), Mention(entity_type='PER', start='21', end='22', text='@'), Mention(entity_type='PER', start='22', end='23', text='shafeeva1'), Mention(entity_type='PER', start='25', end='26', text='@'), Mention(entity_type='PER', start='26', end='27', text='justinbieber')]
+  - "Justin" [PER] (0:1)
+  - "@" [PER] (21:22)
+  - "shafeeva1" [PER] (22:23)
+  - "@" [PER] (25:26)
+  - "justinbieber" [PER] (26:27)
+
+PREDICTIONS:
+  - "Justin" [PER] (0:1)
+  - "@" [PER] (22:23)
+  - "shafeeva1" [PER] (23:24)
+  - "justinbieber" [PER] (27:28)
+
+PARTIAL MATCH METRICS:
+Exact Match F1: 0.2222
+Left Boundary Match F1: 0.4444
+Right Boundary Match F1: 0.4444
+Partial Overlap F1: 0.4444
+Overlap Percentage F1: 0.4444
+
+DETAILED ANALYSIS:
+
+  Gold: "Justin" [PER] vs Pred: "Justin" [PER]
+  Overlap: "J" (1 chars)
+  Overlap covers 100.0% of gold and 100.0% of prediction
+  LEFT BOUNDARY MATCH: Yes
+  RIGHT BOUNDARY MATCH: Yes
+
+  Gold: "shafeeva1" [PER] vs Pred: "@" [PER]
+  Overlap: "r" (1 chars)
+  Overlap covers 100.0% of gold and 100.0% of prediction
+  LEFT BOUNDARY MATCH: Yes
+  RIGHT BOUNDARY MATCH: Yes
+
+================================================================================
+
+Sentence 25: 20 Pictures From the Topkapi Palace in Istanbul http://t.co/iS9RmljhDm via @turkishtravel
+--------------------------------------------------------------------------------
+GOLD MENTIONS:
+Mention object: [Mention(entity_type='LOC', start='4', end='6', text='Topkapi Palace'), Mention(entity_type='LOC', start='7', end='8', text='Istanbul')]
+  - "Topkapi Palace" [LOC] (4:6)
+  - "Istanbul" [LOC] (7:8)
+
+PREDICTIONS:
+  - "Topkapi Palace" [LOC] (4:6)
+  - "Istanbul" [LOC] (7:8)
+  - "@" [PER] (14:15)
+  - "turkishtravel" [PER] (15:16)
+
+PARTIAL MATCH METRICS:
+Exact Match F1: 0.6667
+Left Boundary Match F1: 0.6667
+Right Boundary Match F1: 0.6667
+Partial Overlap F1: 0.6667
+Overlap Percentage F1: 0.6667
+
+DETAILED ANALYSIS:
+
+  Gold: "Topkapi Palace" [LOC] vs Pred: "Topkapi Palace" [LOC]
+  Overlap: "ic" (2 chars)
+  Overlap covers 100.0% of gold and 100.0% of prediction
+  LEFT BOUNDARY MATCH: Yes
+  RIGHT BOUNDARY MATCH: Yes
+
+  Gold: "Istanbul" [LOC] vs Pred: "Istanbul" [LOC]
+  Overlap: "u" (1 chars)
+  Overlap covers 100.0% of gold and 100.0% of prediction
+  LEFT BOUNDARY MATCH: Yes
+  RIGHT BOUNDARY MATCH: Yes
+
+================================================================================
+
+Sentence 27: @ Frenzeeeee @ RussellCosta3 @ Dave_Sciarra1 @ APesky11 and madden
+--------------------------------------------------------------------------------
+GOLD MENTIONS:
+Mention object: [Mention(entity_type='PER', start='0', end='1', text='@'), Mention(entity_type='PER', start='1', end='2', text='Frenzeeeee'), Mention(entity_type='PER', start='2', end='3', text='@'), Mention(entity_type='PER', start='3', end='4', text='RussellCosta3'), Mention(entity_type='PER', start='4', end='5', text='@'), Mention(entity_type='PER', start='5', end='6', text='Dave_Sciarra1'), Mention(entity_type='PER', start='6', end='7', text='@'), Mention(entity_type='PER', start='7', end='8', text='APesky11'), Mention(entity_type='PER', start='9', end='10', text='madden')]
+  - "@" [PER] (0:1)
+  - "Frenzeeeee" [PER] (1:2)
+  - "@" [PER] (2:3)
+  - "RussellCosta3" [PER] (3:4)
+  - "@" [PER] (4:5)
+  - "Dave_Sciarra1" [PER] (5:6)
+  - "@" [PER] (6:7)
+  - "APesky11" [PER] (7:8)
+  - "madden" [PER] (9:10)
+
+PREDICTIONS:
+  - "@" [PER] (0:1)
+  - "Frenzeeeee" [PER] (1:2)
+  - "@" [PER] (2:3)
+  - "RussellCosta3" [PER] (3:4)
+  - "@" [PER] (4:5)
+  - "Dave" [PER] (5:6)
+  - "Sciarra1" [PER] (7:8)
+  - "@" [PER] (8:9)
+  - "APesky11" [PER] (9:10)
+
+PARTIAL MATCH METRICS:
+Exact Match F1: 0.5556
+Left Boundary Match F1: 0.8889
+Right Boundary Match F1: 0.8889
+Partial Overlap F1: 0.8889
+Overlap Percentage F1: 0.8889
+
+DETAILED ANALYSIS:
+
+  Gold: "@" [PER] vs Pred: "@" [PER]
+  Overlap: "@" (1 chars)
+  Overlap covers 100.0% of gold and 100.0% of prediction
+  LEFT BOUNDARY MATCH: Yes
+  RIGHT BOUNDARY MATCH: Yes
+
+  Gold: "Frenzeeeee" [PER] vs Pred: "Frenzeeeee" [PER]
+  Overlap: " " (1 chars)
+  Overlap covers 100.0% of gold and 100.0% of prediction
+  LEFT BOUNDARY MATCH: Yes
+  RIGHT BOUNDARY MATCH: Yes
+
+  Gold: "@" [PER] vs Pred: "@" [PER]
+  Overlap: "F" (1 chars)
+  Overlap covers 100.0% of gold and 100.0% of prediction
+  LEFT BOUNDARY MATCH: Yes
+  RIGHT BOUNDARY MATCH: Yes
+
+  Gold: "RussellCosta3" [PER] vs Pred: "RussellCosta3" [PER]
+  Overlap: "r" (1 chars)
+  Overlap covers 100.0% of gold and 100.0% of prediction
+  LEFT BOUNDARY MATCH: Yes
+  RIGHT BOUNDARY MATCH: Yes
+
+  Gold: "@" [PER] vs Pred: "@" [PER]
+  Overlap: "e" (1 chars)
+  Overlap covers 100.0% of gold and 100.0% of prediction
+  LEFT BOUNDARY MATCH: Yes
+  RIGHT BOUNDARY MATCH: Yes
+
+  Gold: "Dave_Sciarra1" [PER] vs Pred: "Dave" [PER]
+  Overlap: "n" (1 chars)
+  Overlap covers 100.0% of gold and 100.0% of prediction
+  LEFT BOUNDARY MATCH: Yes
+  RIGHT BOUNDARY MATCH: Yes
+
+  Gold: "APesky11" [PER] vs Pred: "Sciarra1" [PER]
+  Overlap: "e" (1 chars)
+  Overlap covers 100.0% of gold and 100.0% of prediction
+  LEFT BOUNDARY MATCH: Yes
+  RIGHT BOUNDARY MATCH: Yes
+
+  Gold: "madden" [PER] vs Pred: "APesky11" [PER]
+  Overlap: "e" (1 chars)
+  Overlap covers 100.0% of gold and 100.0% of prediction
+  LEFT BOUNDARY MATCH: Yes
+  RIGHT BOUNDARY MATCH: Yes
+
+================================================================================
+
+Sentence 31: RT @ monica_ayu06 : Be better than before :)
+--------------------------------------------------------------------------------
+GOLD MENTIONS:
+Mention object: [Mention(entity_type='PER', start='1', end='2', text='@'), Mention(entity_type='PER', start='2', end='3', text='monica_ayu06')]
+  - "@" [PER] (1:2)
+  - "monica_ayu06" [PER] (2:3)
+
+PREDICTIONS:
+  - "@" [PER] (1:2)
+  - "monica" [PER] (2:3)
+
+PARTIAL MATCH METRICS:
+Exact Match F1: 0.5000
+Left Boundary Match F1: 1.0000
+Right Boundary Match F1: 1.0000
+Partial Overlap F1: 1.0000
+Overlap Percentage F1: 1.0000
+
+DETAILED ANALYSIS:
+
+  Gold: "@" [PER] vs Pred: "@" [PER]
+  Overlap: "T" (1 chars)
+  Overlap covers 100.0% of gold and 100.0% of prediction
+  LEFT BOUNDARY MATCH: Yes
+  RIGHT BOUNDARY MATCH: Yes
+
+  Gold: "monica_ayu06" [PER] vs Pred: "monica" [PER]
+  Overlap: " " (1 chars)
+  Overlap covers 100.0% of gold and 100.0% of prediction
+  LEFT BOUNDARY MATCH: Yes
+  RIGHT BOUNDARY MATCH: Yes
+
+================================================================================
+
+Sentence 39: Sinkhole blamed for forklift topple : The Health and Safety Executive confirms it is investigating how a forkli . . . http://t.co/sgIYKaFDO3
+--------------------------------------------------------------------------------
+GOLD MENTIONS:
+Mention object: [Mention(entity_type='ORG', start='6', end='11', text='The Health and Safety Executive')]
+  - "The Health and Safety Executive" [ORG] (6:11)
+
+PREDICTIONS:
+  - "Health and Safety Executive" [ORG] (7:11)
+
+PARTIAL MATCH METRICS:
+Exact Match F1: 0.0000
+Left Boundary Match F1: 0.0000
+Right Boundary Match F1: 1.0000
+Partial Overlap F1: 1.0000
+Overlap Percentage F1: 0.8000
+
+DETAILED ANALYSIS:
+
+  Gold: "The Health and Safety Executive" [ORG] vs Pred: "Health and Safety Executive" [ORG]
+  Overlap: "e bl" (4 chars)
+  Overlap covers 80.0% of gold and 100.0% of prediction
+  LEFT BOUNDARY MISMATCH: Gold=6, Pred=7, Offset=1
+  RIGHT BOUNDARY MATCH: Yes
+
+================================================================================
+
+Sentence 42: @deanstopdying gavin bottoms
+--------------------------------------------------------------------------------
+GOLD MENTIONS:
+Mention object: [Mention(entity_type='PER', start='1', end='2', text='gavin')]
+  - "gavin" [PER] (1:2)
+
+PREDICTIONS:
+  - "@" [PER] (0:1)
+  - "deanstopdying" [PER] (1:2)
+  - "gavin" [PER] (2:3)
+
+PARTIAL MATCH METRICS:
+Exact Match F1: 0.0000
+Left Boundary Match F1: 0.5000
+Right Boundary Match F1: 0.5000
+Partial Overlap F1: 0.5000
+Overlap Percentage F1: 0.5000
+
+DETAILED ANALYSIS:
+
+  Gold: "gavin" [PER] vs Pred: "deanstopdying" [PER]
+  Overlap: "d" (1 chars)
+  Overlap covers 100.0% of gold and 100.0% of prediction
+  LEFT BOUNDARY MATCH: Yes
+  RIGHT BOUNDARY MATCH: Yes
+
+================================================================================
+
+Sentence 53: @ theresaaang_ @ DanicasandreasD @ Aileenrms @Ysaadalawatatlo @ivy_ni_caesey Atleast aminado :D HAHAHAHA
+--------------------------------------------------------------------------------
+GOLD MENTIONS:
+Mention object: [Mention(entity_type='PER', start='0', end='1', text='@'), Mention(entity_type='PER', start='1', end='2', text='theresaaang_'), Mention(entity_type='PER', start='2', end='3', text='@'), Mention(entity_type='PER', start='3', end='4', text='DanicasandreasD'), Mention(entity_type='PER', start='4', end='5', text='@'), Mention(entity_type='PER', start='5', end='6', text='Aileenrms'), Mention(entity_type='PER', start='9', end='10', text='aminado')]
+  - "@" [PER] (0:1)
+  - "theresaaang_" [PER] (1:2)
+  - "@" [PER] (2:3)
+  - "DanicasandreasD" [PER] (3:4)
+  - "@" [PER] (4:5)
+  - "Aileenrms" [PER] (5:6)
+  - "aminado" [PER] (9:10)
+
+PREDICTIONS:
+  - "@" [PER] (0:1)
+  - "theresaaang" [PER] (1:2)
+  - "@" [PER] (3:4)
+  - "DanicasandreasD" [PER] (4:5)
+  - "@" [PER] (5:6)
+  - "Aileenrms" [PER] (6:7)
+  - "@" [PER] (7:8)
+  - "Ysaadalawatatlo" [PER] (8:9)
+  - "@" [PER] (9:10)
+  - "ivy" [PER] (10:11)
+
+PARTIAL MATCH METRICS:
+Exact Match F1: 0.1176
+Left Boundary Match F1: 0.7059
+Right Boundary Match F1: 0.7059
+Partial Overlap F1: 0.7059
+Overlap Percentage F1: 0.7059
+
+DETAILED ANALYSIS:
+
+  Gold: "@" [PER] vs Pred: "@" [PER]
+  Overlap: "@" (1 chars)
+  Overlap covers 100.0% of gold and 100.0% of prediction
+  LEFT BOUNDARY MATCH: Yes
+  RIGHT BOUNDARY MATCH: Yes
+
+  Gold: "theresaaang_" [PER] vs Pred: "theresaaang" [PER]
+  Overlap: " " (1 chars)
+  Overlap covers 100.0% of gold and 100.0% of prediction
+  LEFT BOUNDARY MATCH: Yes
+  RIGHT BOUNDARY MATCH: Yes
+
+  Gold: "DanicasandreasD" [PER] vs Pred: "@" [PER]
+  Overlap: "h" (1 chars)
+  Overlap covers 100.0% of gold and 100.0% of prediction
+  LEFT BOUNDARY MATCH: Yes
+  RIGHT BOUNDARY MATCH: Yes
+
+  Gold: "@" [PER] vs Pred: "DanicasandreasD" [PER]
+  Overlap: "e" (1 chars)
+  Overlap covers 100.0% of gold and 100.0% of prediction
+  LEFT BOUNDARY MATCH: Yes
+  RIGHT BOUNDARY MATCH: Yes
+
+  Gold: "Aileenrms" [PER] vs Pred: "@" [PER]
+  Overlap: "r" (1 chars)
+  Overlap covers 100.0% of gold and 100.0% of prediction
+  LEFT BOUNDARY MATCH: Yes
+  RIGHT BOUNDARY MATCH: Yes
+
+  Gold: "aminado" [PER] vs Pred: "@" [PER]
+  Overlap: "a" (1 chars)
+  Overlap covers 100.0% of gold and 100.0% of prediction
+  LEFT BOUNDARY MATCH: Yes
+  RIGHT BOUNDARY MATCH: Yes
+
+================================================================================
+
+Sentence 57: @ TheManicMedium Thanks for the #follow, Kent ! Check out my #mystery and #paranormal #books and #videos at http://t.co/uXW0vF5GdQ
+--------------------------------------------------------------------------------
+GOLD MENTIONS:
+Mention object: [Mention(entity_type='ORG', start='0', end='1', text='@'), Mention(entity_type='ORG', start='1', end='2', text='TheManicMedium'), Mention(entity_type='PER', start='6', end='7', text='Kent')]
+  - "@" [ORG] (0:1)
+  - "TheManicMedium" [ORG] (1:2)
+  - "Kent" [PER] (6:7)
+
+PREDICTIONS:
+  - "@" [ORG] (0:1)
+  - "TheManicMedium" [ORG] (1:2)
+  - "Kent" [LOC] (8:9)
+
+PARTIAL MATCH METRICS:
+Exact Match F1: 0.6667
+Left Boundary Match F1: 0.6667
+Right Boundary Match F1: 0.6667
+Partial Overlap F1: 0.6667
+Overlap Percentage F1: 0.6667
+
+DETAILED ANALYSIS:
+
+  Gold: "@" [ORG] vs Pred: "@" [ORG]
+  Overlap: "@" (1 chars)
+  Overlap covers 100.0% of gold and 100.0% of prediction
+  LEFT BOUNDARY MATCH: Yes
+  RIGHT BOUNDARY MATCH: Yes
+
+  Gold: "TheManicMedium" [ORG] vs Pred: "TheManicMedium" [ORG]
+  Overlap: " " (1 chars)
+  Overlap covers 100.0% of gold and 100.0% of prediction
+  LEFT BOUNDARY MATCH: Yes
+  RIGHT BOUNDARY MATCH: Yes
+
+================================================================================
+
+Sentence 59: I 'm at Universidade Federal do Tocantins ( UFT ) - @uftoficial ( Palmas , TO ) w / 2 others http://t.co/2SgoMq9ETZ
+--------------------------------------------------------------------------------
+GOLD MENTIONS:
+Mention object: [Mention(entity_type='LOC', start='3', end='7', text='Universidade Federal do Tocantins'), Mention(entity_type='LOC', start='8', end='9', text='UFT'), Mention(entity_type='LOC', start='13', end='16', text='Palmas , TO')]
+  - "Universidade Federal do Tocantins" [LOC] (3:7)
+  - "UFT" [LOC] (8:9)
+  - "Palmas , TO" [LOC] (13:16)
+
+PREDICTIONS:
+  - "Universidade Federal" [LOC] (4:6)
+  - "Tocantins" [LOC] (7:8)
+  - "@" [PER] (12:13)
+  - "uftoficial" [PER] (13:14)
+  - "Palmas" [LOC] (15:16)
+
+PARTIAL MATCH METRICS:
+Exact Match F1: 0.0000
+Left Boundary Match F1: 0.0000
+Right Boundary Match F1: 0.2500
+Partial Overlap F1: 0.5000
+Overlap Percentage F1: 0.2083
+
+DETAILED ANALYSIS:
+
+  Gold: "Universidade Federal do Tocantins" [LOC] vs Pred: "Universidade Federal" [LOC]
+  Overlap: " a" (2 chars)
+  Overlap covers 50.0% of gold and 100.0% of prediction
+  LEFT BOUNDARY MISMATCH: Gold=3, Pred=4, Offset=1
+  RIGHT BOUNDARY MISMATCH: Gold=7, Pred=6, Offset=-1
+
+  Gold: "Palmas , TO" [LOC] vs Pred: "uftoficial" [PER]
+  Overlap: "r" (1 chars)
+  Overlap covers 33.3% of gold and 100.0% of prediction
+  LEFT BOUNDARY MATCH: Yes
+  RIGHT BOUNDARY MISMATCH: Gold=16, Pred=14, Offset=-2
+
+  Gold: "Palmas , TO" [LOC] vs Pred: "Palmas" [LOC]
+  Overlap: "i" (1 chars)
+  Overlap covers 33.3% of gold and 100.0% of prediction
+  LEFT BOUNDARY MISMATCH: Gold=13, Pred=15, Offset=2
+  RIGHT BOUNDARY MATCH: Yes
+
+================================================================================
+
+Sentence 62: @SexGoddMendes @ JacobWhitesides but I wo n't .
+--------------------------------------------------------------------------------
+GOLD MENTIONS:
+Mention object: [Mention(entity_type='PER', start='1', end='2', text='@'), Mention(entity_type='PER', start='2', end='3', text='JacobWhitesides')]
+  - "@" [PER] (1:2)
+  - "JacobWhitesides" [PER] (2:3)
+
+PREDICTIONS:
+  - "@" [PER] (0:1)
+  - "SexGoddMendes" [PER] (1:2)
+  - "@" [PER] (2:3)
+  - "JacobWhitesides" [PER] (3:4)
+
+PARTIAL MATCH METRICS:
+Exact Match F1: 0.0000
+Left Boundary Match F1: 0.6667
+Right Boundary Match F1: 0.6667
+Partial Overlap F1: 0.6667
+Overlap Percentage F1: 0.6667
+
+DETAILED ANALYSIS:
+
+  Gold: "@" [PER] vs Pred: "SexGoddMendes" [PER]
+  Overlap: "S" (1 chars)
+  Overlap covers 100.0% of gold and 100.0% of prediction
+  LEFT BOUNDARY MATCH: Yes
+  RIGHT BOUNDARY MATCH: Yes
+
+  Gold: "JacobWhitesides" [PER] vs Pred: "@" [PER]
+  Overlap: "e" (1 chars)
+  Overlap covers 100.0% of gold and 100.0% of prediction
+  LEFT BOUNDARY MATCH: Yes
+  RIGHT BOUNDARY MATCH: Yes
+
+================================================================================
+
+Sentence 65: Pardew the pikey ! @ DavidMeyler7 http://t.co/XnzIzfIyzQ
+--------------------------------------------------------------------------------
+GOLD MENTIONS:
+Mention object: [Mention(entity_type='PER', start='4', end='5', text='@'), Mention(entity_type='PER', start='5', end='6', text='DavidMeyler7')]
+  - "@" [PER] (4:5)
+  - "DavidMeyler7" [PER] (5:6)
+
+PREDICTIONS:
+  - "Pardew" [PER] (0:1)
+  - "@" [PER] (4:5)
+  - "DavidMeyler7" [PER] (5:6)
+
+PARTIAL MATCH METRICS:
+Exact Match F1: 0.8000
+Left Boundary Match F1: 0.8000
+Right Boundary Match F1: 0.8000
+Partial Overlap F1: 0.8000
+Overlap Percentage F1: 0.8000
+
+DETAILED ANALYSIS:
+
+  Gold: "@" [PER] vs Pred: "@" [PER]
+  Overlap: "e" (1 chars)
+  Overlap covers 100.0% of gold and 100.0% of prediction
+  LEFT BOUNDARY MATCH: Yes
+  RIGHT BOUNDARY MATCH: Yes
+
+  Gold: "DavidMeyler7" [PER] vs Pred: "DavidMeyler7" [PER]
+  Overlap: "w" (1 chars)
+  Overlap covers 100.0% of gold and 100.0% of prediction
+  LEFT BOUNDARY MATCH: Yes
+  RIGHT BOUNDARY MATCH: Yes
+
+================================================================================
+
+Sentence 66: @ StephenGrootes we about to vote , it 's taken 20min at bryneven primary school
+--------------------------------------------------------------------------------
+GOLD MENTIONS:
+Mention object: [Mention(entity_type='PER', start='0', end='1', text='@'), Mention(entity_type='PER', start='1', end='2', text='StephenGrootes'), Mention(entity_type='LOC', start='12', end='15', text='bryneven primary school')]
+  - "@" [PER] (0:1)
+  - "StephenGrootes" [PER] (1:2)
+  - "bryneven primary school" [LOC] (12:15)
+
+PREDICTIONS:
+  - "@" [PER] (0:1)
+  - "StephenGrootes" [PER] (1:2)
+
+PARTIAL MATCH METRICS:
+Exact Match F1: 0.8000
+Left Boundary Match F1: 0.8000
+Right Boundary Match F1: 0.8000
+Partial Overlap F1: 0.8000
+Overlap Percentage F1: 0.8000
+
+DETAILED ANALYSIS:
+
+  Gold: "@" [PER] vs Pred: "@" [PER]
+  Overlap: "@" (1 chars)
+  Overlap covers 100.0% of gold and 100.0% of prediction
+  LEFT BOUNDARY MATCH: Yes
+  RIGHT BOUNDARY MATCH: Yes
+
+  Gold: "StephenGrootes" [PER] vs Pred: "StephenGrootes" [PER]
+  Overlap: " " (1 chars)
+  Overlap covers 100.0% of gold and 100.0% of prediction
+  LEFT BOUNDARY MATCH: Yes
+  RIGHT BOUNDARY MATCH: Yes
+
+================================================================================
+
+Sentence 69: RT @ HorrorPlaces : Family Doctors Clinic , Germany http://t.co/ZmUyH0STbg

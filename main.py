@@ -17,7 +17,7 @@ data_folder = 'broad_twitter_corpus'
 
 # load the data into a Corpus of Sentences
 # removed 1 specific tweet from the dev set which was causing an error while loading the data
-corpus: Corpus = ColumnCorpus(data_folder, columns, train_file='btc.train', test_file='btc.test', dev_file='use_this.dev', column_delimiter="\t")
+corpus: Corpus = ColumnCorpus(data_folder=data_folder, column_format=columns, train_file='btc.train', test_file='btc.test', dev_file='use_this.dev', column_delimiter="\t")
 
 # as a test to start out, using smaller train set to speed up training
 # corpus: Corpus = ColumnCorpus(data_folder, columns, train_file='a.conll', test_file='f.conll', dev_file='hfixed.conll')
@@ -36,6 +36,7 @@ embedding_types = [
 
 embeddings = StackedEmbeddings(embeddings=embedding_types)
 
+# TODO before next train, try adding tag_format = 'BIO' - by default, this is using BIOES
 tagger = SequenceTagger(hidden_size=256,
                         embeddings=embeddings,
                         tag_dictionary=label_dict,
@@ -61,7 +62,7 @@ def perform_error_analysis(model, corpus, output_file='error_analysis.txt'):
             gold_mentions = Scorer.create_mentions(sentence.get_labels())
             
             # Get model predictions
-            prediction_sentence = Sentence(sentence.text)
+            prediction_sentence = Sentence(sentence.text) # I think this causes different tokenization in the predictions
             model.predict(prediction_sentence)
             predicted_mentions = Scorer.create_mentions(prediction_sentence.get_labels())
             
@@ -81,12 +82,13 @@ def perform_error_analysis(model, corpus, output_file='error_analysis.txt'):
             
             # Compare gold and predictions
             f.write("GOLD MENTIONS:\n")
+            f.write("Mention object: " + str(gold_mentions) + "\n")
             for mention in gold_mentions:
                 try:
                     # Ensure start and end are integers
                     start = int(mention.start)
                     end = int(mention.end)
-                    text = sentence.text[start:end]
+                    text = mention.text
                     # Use entity_type instead of tag (or get any available attribute safely)
                     entity_type = getattr(mention, 'entity_type', getattr(mention, 'type', getattr(mention, 'label', '???')))
                     f.write(f"  - \"{text}\" [{entity_type}] ({start}:{end})\n")
@@ -99,7 +101,7 @@ def perform_error_analysis(model, corpus, output_file='error_analysis.txt'):
                     # Ensure start and end are integers
                     start = int(mention.start)
                     end = int(mention.end)
-                    text = sentence.text[start:end]
+                    text = mention.text
                     # Use entity_type instead of tag (or get any available attribute safely)
                     entity_type = getattr(mention, 'entity_type', getattr(mention, 'type', getattr(mention, 'label', '???')))
                     f.write(f"  - \"{text}\" [{entity_type}] ({start}:{end})\n")
@@ -118,14 +120,14 @@ def perform_error_analysis(model, corpus, output_file='error_analysis.txt'):
                 try:
                     gold_start = int(gold.start)
                     gold_end = int(gold.end)
-                    gold_text = sentence.text[gold_start:gold_end]
+                    gold_text = gold.text
                     gold_type = getattr(gold, 'entity_type', getattr(gold, 'type', getattr(gold, 'label', '???')))
                     
                     for pred in predicted_mentions:
                         try:
                             pred_start = int(pred.start)
                             pred_end = int(pred.end)
-                            pred_text = sentence.text[pred_start:pred_end]
+                            pred_text = pred.text
                             pred_type = getattr(pred, 'entity_type', getattr(pred, 'type', getattr(pred, 'label', '???')))
                             
                             # Check if there is any overlap
@@ -165,34 +167,35 @@ def perform_error_analysis(model, corpus, output_file='error_analysis.txt'):
     print(f"Error analysis written to {output_file}")
 
 
-result = model.evaluate(data_points=corpus.dev, gold_label_type='ner', gold_label_dictionary=label_dict)
+# result = model.evaluate(data_points=corpus.dev, gold_label_type='ner', gold_label_dictionary=label_dict)
 
-print("Flair built-in F1:", result.main_score)
+# print("Flair built-in F1:", result.main_score)
 
-scores = Scorer([], [])
-for i, sentence in tqdm(enumerate(corpus.dev), total=len(corpus.dev)):
-    reference = Scorer.create_mentions(sentence.get_labels())
-    unlabeled = Sentence(sentence.text)
-    model.predict(unlabeled)
-    predictions = Scorer.create_mentions(unlabeled.get_labels())
-    scores.merge(Scorer(reference, predictions))
+# scores = Scorer([], [])
+# for i, sentence in tqdm(enumerate(corpus.dev), total=len(corpus.dev)):
+#     reference = Scorer.create_mentions(sentence.get_labels())
+#     unlabeled = Sentence(sentence.text)
+#     model.predict(unlabeled)
+#     predictions = Scorer.create_mentions(unlabeled.get_labels())
+#     scores.merge(Scorer(reference, predictions))
 
-print("\n===== NER Evaluation Results =====")
-print("Exact Match Metrics (Traditional):")
-print(f"Custom Scorer F1: {scores.f1_score():.4f}")
-print(f"Precision: {scores.precision():.4f}")
-print(f"Recall: {scores.recall():.4f}")
+# print("\n===== NER Evaluation Results =====")
+# print("Exact Match Metrics (Traditional):")
+# print(f"Custom Scorer F1: {scores.f1_score():.4f}")
+# print(f"Precision: {scores.precision():.4f}")
+# print(f"Recall: {scores.recall():.4f}")
 
-print("\nPartial Match Metrics:")
-print(f"Left Boundary Match F1: {scores.left_match_f1():.4f}")
-print(f"Right Boundary Match F1: {scores.right_match_f1():.4f}")
-print(f"Partial Overlap F1: {scores.partial_match_f1():.4f}")
-print(f"Overlap Percentage F1: {scores.overlap_f1():.4f}")
+# print("\nPartial Match Metrics:")
+# print(f"Left Boundary Match F1: {scores.left_match_f1():.4f}")
+# print(f"Right Boundary Match F1: {scores.right_match_f1():.4f}")
+# print(f"Partial Overlap F1: {scores.partial_match_f1():.4f}")
+# print(f"Overlap Percentage F1: {scores.overlap_f1():.4f}")
 
-print("\nDetailed Partial Match Metrics:")
-print(f"Left Match - Precision: {scores.left_match_precision():.4f}, Recall: {scores.left_match_recall():.4f}")
-print(f"Right Match - Precision: {scores.right_match_precision():.4f}, Recall: {scores.right_match_recall():.4f}")
-print(f"Partial Match - Precision: {scores.partial_match_precision():.4f}, Recall: {scores.partial_match_recall():.4f}")
-print(f"Overlap - Precision: {scores.overlap_precision():.4f}, Recall: {scores.overlap_recall():.4f}")
+# print("\nDetailed Partial Match Metrics:")
+# print(f"Left Match - Precision: {scores.left_match_precision():.4f}, Recall: {scores.left_match_recall():.4f}")
+# print(f"Right Match - Precision: {scores.right_match_precision():.4f}, Recall: {scores.right_match_recall():.4f}")
+# print(f"Partial Match - Precision: {scores.partial_match_precision():.4f}, Recall: {scores.partial_match_recall():.4f}")
+# print(f"Overlap - Precision: {scores.overlap_precision():.4f}, Recall: {scores.overlap_recall():.4f}")
 
-perform_error_analysis(model, corpus, output_file='ner_error_analysis.txt')
+# perform_error_analysis(model, corpus, output_file='ner_error_analysis.txt')
+perform_error_analysis(model, corpus, output_file='ner_error_analysis_2.txt')

@@ -6,7 +6,6 @@ from typing import Sequence, Dict, Tuple, List, Set, Optional
 from flair.data import Sentence
 from flair.nn import Classifier
 
-# this is from COSI 216A HW1
 class Mention(NamedTuple):
     """
     Start index inclusive, end index exclusive.
@@ -14,6 +13,7 @@ class Mention(NamedTuple):
     entity_type: str
     start: int
     end: int
+    text: str
 
 class Scorer:
     def __init__(self, reference: Sequence[Mention], predictions: Sequence[Mention]) -> None:
@@ -257,7 +257,8 @@ class Scorer:
             entity_type = label.value
             start = label.unlabeled_identifier.split(":")[0].split("[")[1]
             end = label.unlabeled_identifier.split(":")[1].split("]")[0]
-            mentions.append(Mention(entity_type, start, end))
+            text = label.data_point.text
+            mentions.append(Mention(entity_type, start, end, text))
         return mentions
     
 
@@ -271,4 +272,10 @@ if __name__ == "__main__":
 
     print(sentence)
 
+    gold = [Mention(entity_type='PER', start='0', end='2', text='George Washington'), Mention(entity_type='LOC', start='4', end='5', text='Washington')]
+
     print(Scorer.create_mentions(sentence.get_labels()))
+
+    test = Scorer(gold, Scorer.create_mentions(sentence.get_labels()))
+
+    print(test.f1_score())
