@@ -132,7 +132,7 @@ if __name__ == "__main__":
 
     # extract the labels from the corpus
     label_type = 'ner'
-    label_dict = corpus.make_label_dictionary(label_type=label_type, add_unk=False)
+    label_dict = corpus.make_label_dictionary(label_type=label_type, add_unk=True)
 
     # load model from file
     model = SequenceTagger.load(os.path.join('resources', 'taggers', 'sota-ner-flair', 'final-model.pt'))
@@ -140,6 +140,7 @@ if __name__ == "__main__":
     # evaluate with flair
     result = model.evaluate(data_points=corpus.dev, gold_label_type=label_type, gold_label_dictionary=label_dict)
 
+    print(result.detailed_results)
     print("Flair built-in F1:", result.main_score)
 
     # use our scorer to calculate F1

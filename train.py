@@ -10,7 +10,7 @@ from tqdm import tqdm
 from scorer import Scorer
 
 
-def load_corpus(data_folder: str = 'broad_twitter_corpus', train_file='train.txt', test_file='test.txt', dev_file='dev.txt', delim = " ", debug: bool = False) -> Corpus:
+def load_corpus(data_folder: str = 'broad_twitter_corpus', train_file='btc.train', test_file='btc.test', dev_file='use_this.dev', delim = "\t", debug: bool = False) -> Corpus:
     # dataset format
     columns = {0: 'text', 1: 'ner'}
 
@@ -57,7 +57,7 @@ if __name__ == "__main__":
 
     # extract the labels from the corpus
     label_type = 'ner'
-    label_dict = corpus.make_label_dictionary(label_type=label_type, add_unk=False)
+    label_dict = corpus.make_label_dictionary(label_type=label_type, add_unk=True)
 
     # train model
     train_model(corpus)
