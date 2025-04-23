@@ -9,6 +9,20 @@ from tqdm import tqdm
 
 from scorer import Scorer
 
+
+def load_corpus() -> Corpus:
+    # dataset format
+    columns = {0: 'text', 1: 'ner'}
+
+    # dataset location
+    data_folder = 'broad_twitter_corpus'
+
+    # load the data into a corpus
+    corpus: Corpus = ColumnCorpus(data_folder=data_folder, column_format=columns, train_file='train.txt', test_file='test.txt', dev_file='dev.txt', column_delimiter="\t")
+
+    return corpus
+
+
 def train_model(corpus: Corpus) -> None:
     # TODO this model is from the flair tutorial and is not tuned
     embedding_types = [
@@ -38,14 +52,8 @@ def grid_search(corpus: Corpus, params) -> None:
 
 
 if __name__ == "__main__":
-    # dataset format
-    columns = {0: 'text', 1: 'ner'}
-
-    # dataset location
-    data_folder = 'broad_twitter_corpus'
-
-    # load the data into a corpus
-    corpus: Corpus = ColumnCorpus(data_folder=data_folder, column_format=columns, train_file='train.txt', test_file='test.txt', dev_file='dev.txt', column_delimiter="\t")
+    # load corpus
+    corpus = load_corpus()
 
     # extract the labels from the corpus
     label_type = 'ner'
