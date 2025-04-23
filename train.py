@@ -10,15 +10,12 @@ from tqdm import tqdm
 from scorer import Scorer
 
 
-def load_corpus(debug: bool = False) -> Corpus:
+def load_corpus(data_folder: str = 'broad_twitter_corpus', train_file='train.txt', test_file='test.txt', dev_file='dev.txt', delim = " ", debug: bool = False) -> Corpus:
     # dataset format
     columns = {0: 'text', 1: 'ner'}
 
-    # dataset location
-    data_folder = 'broad_twitter_corpus'
-
     # load the data into a corpus
-    corpus: Corpus = ColumnCorpus(data_folder=data_folder, column_format=columns, train_file='train.txt', test_file='test.txt', dev_file='dev.txt', column_delimiter="\t")
+    corpus: Corpus = ColumnCorpus(data_folder=data_folder, column_format=columns, train_file=train_file, test_file=test_file, dev_file=dev_file, column_delimiter=delim)
 
     if debug:
         return corpus.downsample(0.1)
@@ -56,7 +53,7 @@ def grid_search(corpus: Corpus, params) -> None:
 
 if __name__ == "__main__":
     # load corpus
-    corpus = load_corpus(debug=True)
+    corpus = load_corpus(data_folder="wnut16", train_file="train", dev_file="dev", test_file="test", delim="\t", debug=True)
 
     # extract the labels from the corpus
     label_type = 'ner'

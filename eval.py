@@ -128,7 +128,7 @@ def perform_error_analysis(model, corpus, output_file='error_analysis.txt'):
 
 if __name__ == "__main__":
     # load corpus
-    corpus = load_corpus(debug=True)
+    corpus = load_corpus()
 
     # extract the labels from the corpus
     label_type = 'ner'
