@@ -198,4 +198,4 @@ def perform_error_analysis(model, corpus, output_file='error_analysis.txt'):
 # print(f"Overlap - Precision: {scores.overlap_precision():.4f}, Recall: {scores.overlap_recall():.4f}")
 
 # perform_error_analysis(model, corpus, output_file='ner_error_analysis.txt')
-perform_error_analysis(model, corpus, output_file='ner_error_analysis_2.txt')
+# perform_error_analysis(model, corpus, output_file='ner_error_analysis_2.txt')
