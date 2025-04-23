@@ -128,11 +128,11 @@ def perform_error_analysis(model, corpus, output_file='error_analysis.txt'):
 
 if __name__ == "__main__":
     # load corpus
-    corpus = load_corpus()
+    corpus = load_corpus(debug=True)
 
     # extract the labels from the corpus
     label_type = 'ner'
-    label_dict = corpus.make_label_dictionary(label_type=label_type, add_unk=True)
+    label_dict = corpus.make_label_dictionary(label_type=label_type, add_unk=False)
 
     # load model from file
     model = SequenceTagger.load(os.path.join('resources', 'taggers', 'sota-ner-flair', 'final-model.pt'))

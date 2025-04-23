@@ -10,7 +10,7 @@ from tqdm import tqdm
 from scorer import Scorer
 
 
-def load_corpus() -> Corpus:
+def load_corpus(debug: bool = False) -> Corpus:
     # dataset format
     columns = {0: 'text', 1: 'ner'}
 
@@ -20,6 +20,9 @@ def load_corpus() -> Corpus:
     # load the data into a corpus
     corpus: Corpus = ColumnCorpus(data_folder=data_folder, column_format=columns, train_file='train.txt', test_file='test.txt', dev_file='dev.txt', column_delimiter="\t")
 
+    if debug:
+        return corpus.downsample(0.1)
+    
     return corpus
 
 
@@ -53,11 +56,11 @@ def grid_search(corpus: Corpus, params) -> None:
 
 if __name__ == "__main__":
     # load corpus
-    corpus = load_corpus()
+    corpus = load_corpus(debug=True)
 
     # extract the labels from the corpus
     label_type = 'ner'
-    label_dict = corpus.make_label_dictionary(label_type=label_type, add_unk=True)
+    label_dict = corpus.make_label_dictionary(label_type=label_type, add_unk=False)
 
     # train model
     train_model(corpus)
