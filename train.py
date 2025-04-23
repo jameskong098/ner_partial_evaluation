@@ -53,7 +53,7 @@ def grid_search(corpus: Corpus, params) -> None:
 
 if __name__ == "__main__":
     # load corpus
-    corpus = load_corpus(data_folder="wnut16", train_file="train", dev_file="dev", test_file="test", delim="\t", debug=True)
+    corpus = load_corpus()
 
     # extract the labels from the corpus
     label_type = 'ner'
