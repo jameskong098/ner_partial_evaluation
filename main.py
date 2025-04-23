@@ -62,7 +62,7 @@ def perform_error_analysis(model, corpus, output_file='error_analysis.txt'):
             gold_mentions = Scorer.create_mentions(sentence.get_labels())
             
             # Get model predictions
-            prediction_sentence = Sentence(sentence.text) # I think this causes different tokenization in the predictions
+            prediction_sentence = Sentence(sentence.text, use_tokenizer=False) # sentence text is already tokenized
             model.predict(prediction_sentence)
             predicted_mentions = Scorer.create_mentions(prediction_sentence.get_labels())
             
