@@ -64,10 +64,33 @@ class TestRightMatch(unittest.TestCase):
 
 
 class TestPartialMatch(unittest.TestCase):
-    def test_double_partial_match(self) -> None:
+    def test_no_double_match(self) -> None:
         reference = [Mention("PER", 0, 2, "Allen Iverson"), Mention("ORG", 2, 3, "Meta"), Mention("LOC", 4, 6, "San Francisco")]
         prediction = [Mention("PER", 1, 3, "Iverson Meta")]
         # this should score as 1 partial match tp
         scores = Scorer(reference, prediction)
         self.assertEqual(scores.partial_match_tp, 1)
+    
+    def test_partial_match_precision(self) -> None:
+        reference = [Mention("PER", 0, 2, "Allen Iverson"), Mention("ORG", 2, 3, "Meta"), Mention("LOC", 4, 6, "San Francisco")]
+        prediction = [Mention("PER", 0, 2, "Iverson"), Mention("LOC", 5, 6, "Francisco")]
+        scores = Scorer(reference, prediction)
+        self.assertAlmostEqual(1, scores.partial_match_precision())
+
+    def test_partial_match_recall(self) -> None:
+        reference = [Mention("PER", 0, 2, "Allen Iverson"), Mention("ORG", 2, 3, "Meta"), Mention("LOC", 4, 6, "San Francisco")]
+        prediction = [Mention("PER", 0, 2, "Iverson"), Mention("LOC", 5, 6, "Francisco")]
+        scores = Scorer(reference, prediction)
+        self.assertAlmostEqual(2/3, scores.partial_match_recall())
+
+    def test_partial_match_f1(self) -> None:
+        reference = [Mention("PER", 0, 2, "Allen Iverson"), Mention("ORG", 2, 3, "Meta"), Mention("LOC", 4, 6, "San Francisco")]
+        prediction = [Mention("PER", 1, 2, "Iverson"), Mention("LOC", 5, 6, "Francisco")]
+        scores = Scorer(reference, prediction)
+        self.assertAlmostEqual(4/5, scores.partial_match_f1())
+
+
+class TestOverlap(unittest.TestCase):
+    # TODO
+    pass
 
