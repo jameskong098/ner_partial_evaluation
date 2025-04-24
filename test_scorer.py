@@ -62,6 +62,12 @@ class TestRightMatch(unittest.TestCase):
         scores = Scorer(reference, prediction)
         self.assertAlmostEqual(4/5, scores.right_match_f1())
 
-class TestPartialBoundaryMatching(unittest.TestCase):
-    pass
+
+class TestPartialMatch(unittest.TestCase):
+    def test_double_partial_match(self) -> None:
+        reference = [Mention("PER", 0, 2, "Allen Iverson"), Mention("ORG", 2, 3, "Meta"), Mention("LOC", 4, 6, "San Francisco")]
+        prediction = [Mention("PER", 1, 3, "Iverson Meta")]
+        # this should score as 1 partial match tp
+        scores = Scorer(reference, prediction)
+        self.assertEqual(scores.partial_match_tp, 1)
 
