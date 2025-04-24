@@ -2,6 +2,14 @@
 
 **Authors:** Charles Sullivan and James Kong
 
+## Our Evaluation Metrics
+
+- Exact: exact type and boundary match
+- Left boundary match: ignores type
+- Right boundary match: ignores type
+- Partial boundary match: any overlap in predicted and reference spans, ignores type
+- Overlap: weighted by overlap b/w predicted and reference spans, ignores type
+
 ## Motivation
 
 Named Entity Recognition (NER) evaluation currently sits between two extremes:

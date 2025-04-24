@@ -6,6 +6,7 @@ from typing import Sequence, Dict, Tuple, List, Set, Optional
 from flair.data import Sentence
 from flair.nn import Classifier
 
+
 class Mention(NamedTuple):
     """
     Start index inclusive, end index exclusive.
@@ -15,6 +16,7 @@ class Mention(NamedTuple):
     end: int
     text: str
 
+
 class Scorer:
     def __init__(self, reference: Sequence[Mention], predictions: Sequence[Mention]) -> None:
         """
@@ -22,6 +24,8 @@ class Scorer:
         """
         reference_set = set(reference)
         predictions_set = set(predictions)
+
+        # strict evaluation
         self.true_positives = len(reference_set & predictions_set)
         self.false_positives = len(predictions_set - reference_set)
         self.false_negatives = len(reference_set - predictions_set)
@@ -29,7 +33,7 @@ class Scorer:
         # Store raw mentions for partial matching
         self.reference = list(reference)
         self.predictions = list(predictions)
-        
+
         self.left_match_tp = 0
         self.right_match_tp = 0
         self.partial_match_tp = 0
@@ -37,6 +41,19 @@ class Scorer:
         self.overlap_scores = 0.0
         
         self._compute_partial_matches()
+
+        left_reference_set = set([(mention.start) for mention in reference])
+        left_predictions_set = set([(mention.start) for mention in predictions])
+        self.left_match_tp = len(left_reference_set & left_predictions_set)
+        self.left_match_fp = len(left_predictions_set - left_reference_set)
+        self.left_match_fn = len(left_reference_set - left_predictions_set)
+
+        right_reference_set = set([(mention.end) for mention in reference])
+        right_predictions_set = set([(mention.end) for mention in predictions])
+        self.right_match_tp = len(right_reference_set & right_predictions_set)
+        self.right_match_fp = len(right_predictions_set - right_reference_set)
+        self.right_match_fn = len(right_reference_set - right_predictions_set)
+
         
     def _compute_partial_matches(self) -> None:
         """
@@ -127,17 +144,17 @@ class Scorer:
         """
         Precision for left boundary matches.
         """
-        if len(self.predictions) == 0:
+        if self.left_match_tp + self.left_match_fp == 0:
             return 0.0
-        return self.left_match_tp / len(self.predictions)
+        return self.left_match_tp / (self.left_match_tp + self.left_match_fp)
     
     def left_match_recall(self) -> float:
         """
         Recall for left boundary matches.
         """
-        if len(self.reference) == 0:
+        if self.left_match_tp + self.left_match_fn == 0:
             return 0.0
-        return self.left_match_tp / len(self.reference)
+        return self.left_match_tp / (self.left_match_tp + self.left_match_fn)
     
     def left_match_f1(self) -> float:
         """
@@ -148,32 +165,59 @@ class Scorer:
         if precision + recall == 0:
             return 0.0
         return (2 * precision * recall) / (precision + recall)
-    
+
     def right_match_precision(self) -> float:
         """
-        Precision for right boundary matches.
+        Precision for left boundary matches.
         """
-        if len(self.predictions) == 0:
+        if self.right_match_tp + self.right_match_fp == 0:
             return 0.0
-        return self.right_match_tp / len(self.predictions)
+        return self.right_match_tp / (self.right_match_tp + self.right_match_fp)
     
     def right_match_recall(self) -> float:
         """
-        Recall for right boundary matches.
+        Recall for left boundary matches.
         """
-        if len(self.reference) == 0:
+        if self.right_match_tp + self.right_match_fn == 0:
             return 0.0
-        return self.right_match_tp / len(self.reference)
+        return self.right_match_tp / (self.right_match_tp + self.right_match_fn)
     
     def right_match_f1(self) -> float:
         """
-        F1 score for right boundary matches.
+        F1 score for left boundary matches.
         """
         precision = self.right_match_precision()
         recall = self.right_match_recall()
         if precision + recall == 0:
             return 0.0
         return (2 * precision * recall) / (precision + recall)
+    
+
+    # def right_match_precision(self) -> float:
+    #     """
+    #     Precision for right boundary matches.
+    #     """
+    #     if len(self.predictions) == 0:
+    #         return 0.0
+    #     return self.right_match_tp / len(self.predictions)
+    
+    # def right_match_recall(self) -> float:
+    #     """
+    #     Recall for right boundary matches.
+    #     """
+    #     if len(self.reference) == 0:
+    #         return 0.0
+    #     return self.right_match_tp / len(self.reference)
+    
+    # def right_match_f1(self) -> float:
+    #     """
+    #     F1 score for right boundary matches.
+    #     """
+    #     precision = self.right_match_precision()
+    #     recall = self.right_match_recall()
+    #     if precision + recall == 0:
+    #         return 0.0
+    #     return (2 * precision * recall) / (precision + recall)
     
     def partial_match_precision(self) -> float:
         """
@@ -227,7 +271,7 @@ class Scorer:
             return 0.0
         return (2 * precision * recall) / (precision + recall)
 
-    def merge(self, other_scorer: "Scorer") -> None:
+    def merge(self, other_scorer: "Scorer") -> None: # TODO fix this
         """
         Adds the other Scorer's counts to this one.
         """
