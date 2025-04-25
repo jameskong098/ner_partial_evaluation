@@ -2,6 +2,17 @@
 
 **Authors:** Charles Sullivan and James Kong
 
+## Our Evaluation Metrics
+
+- Exact: exact type and boundary match
+- Left boundary match: ignores type
+- Right boundary match: ignores type
+- Partial boundary match: any overlap in predicted and reference spans, ignores type
+    - A gold mention can have no more than 1 matching partial prediction
+    - A prediction cannot partially match more than 1 gold mention  
+- Overlap: weighted by overlap b/w predicted and reference spans, ignores type
+    - Same rules as above must apply
+
 ## Motivation
 
 Named Entity Recognition (NER) evaluation currently sits between two extremes:

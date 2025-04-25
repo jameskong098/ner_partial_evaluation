@@ -1,0 +1,28 @@
+
+tweetner7
+F1	
+Token only, window 0: 35.04
+acc	
+Token only, window 0: 87.90
+F1	
+Token only, window 1: 39.06
+acc	
+Token only, window 1: 88.63
+F1	
+Token only, window 2: 41.93
+acc	
+Token only, window 2: 88.04
+
+broad_twitter_corpus
+F1	
+Token only, window 0: 14.35
+acc	
+Token only, window 0: 87.78
+F1	
+Token only, window 1: 66.23
+acc	
+Token only, window 1: 93.50
+F1	
+Token only, window 2: 66.42
+acc	
+Token only, window 2: 93.44

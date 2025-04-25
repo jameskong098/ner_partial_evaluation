@@ -1,0 +1,13 @@
+broad_twitter_corpus changed
+F1	
+Token only, window 0: 57.56
+acc	
+Token only, window 0: 93.30
+F1	
+Token only, window 1: 51.01
+acc	
+Token only, window 1: 92.60
+F1	
+Token only, window 2: 48.26
+acc	
+Token only, window 2: 92.24
