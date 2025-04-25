@@ -1,8 +1,9 @@
 import os
+from pathlib import Path
 
 from flair.data import Corpus, Sentence
 from flair.datasets import ColumnCorpus
-from flair.embeddings import WordEmbeddings, FlairEmbeddings, StackedEmbeddings
+from flair.embeddings import WordEmbeddings, FlairEmbeddings, StackedEmbeddings, CharacterEmbeddings
 from flair.models import SequenceTagger
 from flair.trainers import ModelTrainer
 from tqdm import tqdm
@@ -25,8 +26,10 @@ def load_corpus(data_folder: str = 'broad_twitter_corpus', train_file='btc.train
 
 def train_model(corpus: Corpus) -> None:
     # TODO this model is from the flair tutorial and is not tuned
+
     embedding_types = [
-        WordEmbeddings('glove'),
+        WordEmbeddings('twitter'),
+        CharacterEmbeddings(),
         FlairEmbeddings('news-forward'),
         FlairEmbeddings('news-backward'),
     ]
@@ -37,13 +40,22 @@ def train_model(corpus: Corpus) -> None:
                             embeddings=embeddings,
                             tag_dictionary=label_dict,
                             tag_type=label_type,
-                            tag_format="BIO")
+                            tag_format="BIO",
+                            use_crf=True,
+                            use_rnn=True,)
 
     trainer = ModelTrainer(tagger, corpus)
 
-    trainer.train('resources/taggers/sota-ner-flair',
-                  learning_rate=0.1,
-                  mini_batch_size=32,
+    # Define the output path as a Path object
+    output_path = Path('resources/taggers/sota-ner-flair')
+    output_path.mkdir(parents=True, exist_ok=True) # Ensure the directory exists
+
+    trainer.train(output_path, # Pass the Path object here
+                  monitor_test=True,
+                  patience=3,
+                  anneal_with_restarts=True,
+                  learning_rate=0.05,
+                  mini_batch_size=16,
                   max_epochs=150)
 
 
