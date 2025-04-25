@@ -180,3 +180,11 @@ cython_debug/
 
 # model is large, doesn't upload to github well
 resources/
+
+# using the CRF from HW2 for testing, want to avoid making my solution public
+hw2_utils.py
+hw2.py
+tmp.model
+
+# trying other datasets
+wnut16/

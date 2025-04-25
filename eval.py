@@ -7,51 +7,8 @@ from flair.models import SequenceTagger
 from flair.trainers import ModelTrainer
 from tqdm import tqdm
 
+from train import load_corpus
 from scorer import Scorer
-
-# format of dataset
-columns = {0: 'text', 1: 'ner'}
-
-# location of data files
-data_folder = 'broad_twitter_corpus'
-
-# load the data into a Corpus of Sentences
-# removed 1 specific tweet from the dev set which was causing an error while loading the data
-corpus: Corpus = ColumnCorpus(data_folder=data_folder, column_format=columns, train_file='btc.train', test_file='btc.test', dev_file='use_this.dev', column_delimiter="\t")
-
-# as a test to start out, using smaller train set to speed up training
-# corpus: Corpus = ColumnCorpus(data_folder, columns, train_file='a.conll', test_file='f.conll', dev_file='hfixed.conll')
-
-# extract the labels from the corpus
-label_type = 'ner'
-label_dict = corpus.make_label_dictionary(label_type=label_type, add_unk=True)
-print(label_dict)
-
-# TODO this model is from the flair tutorial and is not tuned
-embedding_types = [
-    WordEmbeddings('glove'),
-    FlairEmbeddings('news-forward'),
-    FlairEmbeddings('news-backward'),
-]
-
-embeddings = StackedEmbeddings(embeddings=embedding_types)
-
-# TODO before next train, try adding tag_format = 'BIO' - by default, this is using BIOES
-# Tested the boave and BIO slightly better in accuracy and F-score micro but worse in F-score macro
-tagger = SequenceTagger(hidden_size=256,
-                        embeddings=embeddings,
-                        tag_dictionary=label_dict,
-                        tag_type=label_type,
-                        tag_format='BIO',)
-
-trainer = ModelTrainer(tagger, corpus)
-
-trainer.train('resources/taggers/sota-ner-flair',
-               learning_rate=0.1,
-               mini_batch_size=32,
-               max_epochs=150)
-
-model = SequenceTagger.load(os.path.join('resources', 'taggers', 'sota-ner-flair', 'best-model.pt'))
 
 
 def perform_error_analysis(model, corpus, output_file='error_analysis.txt'):
@@ -169,39 +126,55 @@ def perform_error_analysis(model, corpus, output_file='error_analysis.txt'):
     print(f"Error analysis written to {output_file}")
 
 
-# result = model.evaluate(data_points=corpus.dev, gold_label_type='ner', gold_label_dictionary=label_dict)
+if __name__ == "__main__":
+    # load corpus
+    corpus = load_corpus()
 
-# print("Flair built-in F1:", result.main_score)
+    # extract the labels from the corpus
+    label_type = 'ner'
+    label_dict = corpus.make_label_dictionary(label_type=label_type, add_unk=True)
 
-# scores = Scorer([], [])
-# for i, sentence in tqdm(enumerate(corpus.dev), total=len(corpus.dev)):
-#     reference = Scorer.create_mentions(sentence.get_labels())
-#     unlabeled = Sentence(sentence.text)
-#     model.predict(unlabeled)
-#     predictions = Scorer.create_mentions(unlabeled.get_labels())
-#     scores.merge(Scorer(reference, predictions))
+    # load model from file
+    model = SequenceTagger.load(os.path.join('resources', 'taggers', 'sota-ner-flair', 'final-model.pt'))
 
-# print("\n===== NER Evaluation Results =====")
-# print("Exact Match Metrics (Traditional):")
-# print(f"Custom Scorer F1: {scores.f1_score():.4f}")
-# print(f"Precision: {scores.precision():.4f}")
-# print(f"Recall: {scores.recall():.4f}")
+    # evaluate with flair
+    result = model.evaluate(data_points=corpus.dev, gold_label_type=label_type, gold_label_dictionary=label_dict)
 
-# print("\nPartial Match Metrics:")
-# print(f"Left Boundary Match F1: {scores.left_match_f1():.4f}")
-# print(f"Right Boundary Match F1: {scores.right_match_f1():.4f}")
-# print(f"Partial Overlap F1: {scores.partial_match_f1():.4f}")
-# print(f"Overlap Percentage F1: {scores.overlap_f1():.4f}")
+    print(result.detailed_results)
+    print("Flair built-in F1:", result.main_score)
 
-# print("\nDetailed Partial Match Metrics:")
-# print(f"Left Match - Precision: {scores.left_match_precision():.4f}, Recall: {scores.left_match_recall():.4f}")
-# print(f"Right Match - Precision: {scores.right_match_precision():.4f}, Recall: {scores.right_match_recall():.4f}")
-# print(f"Partial Match - Precision: {scores.partial_match_precision():.4f}, Recall: {scores.partial_match_recall():.4f}")
-# print(f"Overlap - Precision: {scores.overlap_precision():.4f}, Recall: {scores.overlap_recall():.4f}")
+    # use our scorer to calculate F1
+    scores = Scorer([], [])
+    for i, sentence in tqdm(enumerate(corpus.dev), total=len(corpus.dev)):
+        reference = Scorer.create_mentions(sentence.get_labels())
+        unlabeled = Sentence(sentence.text, use_tokenizer=False) # sentence text is already tokenized
+        model.predict(unlabeled)
+        predictions = Scorer.create_mentions(unlabeled.get_labels())
+        scores.merge(Scorer(reference, predictions))
 
-# perform_error_analysis(model, corpus, output_file='ner_error_analysis.txt')
-# perform_error_analysis(model, corpus, output_file='ner_error_analysis_2.txt')
+    # our score should match Flair's
+    print("Scorer class F1:", scores.f1_score())
 
-# Evaluate using Flair's built-in method for token-level metrics
-result = model.evaluate(data_points=corpus.test, gold_label_type='ner', mini_batch_size=32) # Use test set for final evaluation
-print(result.detailed_results) # This often includes token-level accuracy if calculated by Flair
+    # perform error analysis
+    perform_error_analysis(model, corpus)
+
+    # print("\n===== NER Evaluation Results =====")
+    # print("Exact Match Metrics (Traditional):")
+    # print(f"Custom Scorer F1: {scores.f1_score():.4f}")
+    # print(f"Precision: {scores.precision():.4f}")
+    # print(f"Recall: {scores.recall():.4f}")
+
+    # print("\nPartial Match Metrics:")
+    # print(f"Left Boundary Match F1: {scores.left_match_f1():.4f}")
+    # print(f"Right Boundary Match F1: {scores.right_match_f1():.4f}")
+    # print(f"Partial Overlap F1: {scores.partial_match_f1():.4f}")
+    # print(f"Overlap Percentage F1: {scores.overlap_f1():.4f}")
+
+    # print("\nDetailed Partial Match Metrics:")
+    # print(f"Left Match - Precision: {scores.left_match_precision():.4f}, Recall: {scores.left_match_recall():.4f}")
+    # print(f"Right Match - Precision: {scores.right_match_precision():.4f}, Recall: {scores.right_match_recall():.4f}")
+    # print(f"Partial Match - Precision: {scores.partial_match_precision():.4f}, Recall: {scores.partial_match_recall():.4f}")
+    # print(f"Overlap - Precision: {scores.overlap_precision():.4f}, Recall: {scores.overlap_recall():.4f}")
+
+    result = model.evaluate(data_points=corpus.test, gold_label_type='ner', mini_batch_size=32) # Use test set for final evaluation
+    print(result.detailed_results) # This often includes token-level accuracy if calculated by Flair
