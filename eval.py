@@ -176,5 +176,6 @@ if __name__ == "__main__":
     # print(f"Partial Match - Precision: {scores.partial_match_precision():.4f}, Recall: {scores.partial_match_recall():.4f}")
     # print(f"Overlap - Precision: {scores.overlap_precision():.4f}, Recall: {scores.overlap_recall():.4f}")
 
+    print("\n===== Final Evaluation on Test Set =====")
     result = model.evaluate(data_points=corpus.test, gold_label_type='ner', mini_batch_size=32) # Use test set for final evaluation
     print(result.detailed_results) # This often includes token-level accuracy if calculated by Flair
