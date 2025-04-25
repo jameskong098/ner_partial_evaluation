@@ -362,10 +362,10 @@ class Scorer:
         self.predictions.extend(other_scorer.predictions)
 
     def print_score_report(self): # TODO improve formatting
-        print("Exact:", self.f1_score())
-        print("Left:", self.left_match_f1())
-        print("Right", self.right_match_f1())
-        print("Partial", self.partial_match_f1())
+        print(f"Exact F1: {self.f1_score() * 100:0.2f}")
+        print(f"Left match F1: {self.left_match_f1() * 100:0.2f}")
+        print(f"Right match F1: {self.right_match_f1() * 100:0.2f}")
+        print(f"Partial match F1: {self.partial_match_f1() * 100:0.2f}")
 
     @staticmethod
     def create_mentions(labels: Sequence[Label]) -> list[Mention]:
