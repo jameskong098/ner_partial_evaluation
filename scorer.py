@@ -40,7 +40,7 @@ class Scorer:
         # self.right_match_tp = 0
         # self.partial_match_tp = 0
         # self.type_match_tp = 0
-        # self.overlap_scores = 0.0
+        self.overlap_scores = 0.0
         
         # self._compute_partial_matches()
 
@@ -344,7 +344,7 @@ class Scorer:
         # self.right_match_tp += other_scorer.right_match_tp
         # self.partial_match_tp += other_scorer.partial_match_tp
         # self.type_match_tp += other_scorer.type_match_tp
-        # self.overlap_scores += other_scorer.overlap_scores
+        self.overlap_scores += other_scorer.overlap_scores
         self.left_match_tp += other_scorer.left_match_tp
         self.left_match_fp += other_scorer.left_match_fp
         self.left_match_fn += other_scorer.left_match_fn

@@ -135,7 +135,7 @@ if __name__ == "__main__":
     label_dict = corpus.make_label_dictionary(label_type=label_type, add_unk=True)
 
     # load model from file
-    model = SequenceTagger.load(os.path.join('resources', 'taggers', 'sota-ner-flair', 'final-model.pt'))
+    model = SequenceTagger.load(os.path.join('resources', 'taggers', 'sota-ner-flair', 'best-model.pt'))
 
     # evaluate with flair
     result = model.evaluate(data_points=corpus.dev, gold_label_type=label_type, gold_label_dictionary=label_dict)
