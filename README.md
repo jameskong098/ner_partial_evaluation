@@ -2,7 +2,7 @@
 
 **Authors:** Charles Sullivan and James Kong
 
-## Our Evaluation Metrics
+## Implemented Evaluation Metrics
 
 - Exact: exact type and boundary match
 - Left boundary match: ignores type
@@ -42,16 +42,13 @@ This project explores evaluation metrics that award partial credit to NER predic
 ## Dataset
 
 We will work primarily with Twitter data, where exact matching is particularly challenging:
-- [WNUT16 dataset](https://github.com/aritter/twitter_nlp/blob/master/data/annotated/wnut16/data/dev)
-
-We may additionally explore evaluation across multiple languages to test the robustness of partial evaluation metrics.
+- [Broad Twitter Corpus](https://aclanthology.org/C16-1111.pdf)
 
 ## Methodology
 
 ### Model Implementation
 - Using [FLAIR](https://github.com/flairNLP/flair) with CRF to minimize invalid label sequences
 - Focus on comparing evaluation metrics rather than optimizing model architecture
-- As recommended by Prof. Lignos, we'll avoid downstream task evaluation to keep the project scope manageable
 
 ### Partial Evaluation Metrics
 We will implement and analyze several metrics:
@@ -68,12 +65,6 @@ We will implement and analyze several metrics:
 - Tune models using each scoring metric and compare the results
 - Human evaluation to determine which metrics best align with human judgment
 - Error analysis to identify patterns in partial matches
-
-### Biomedical Applications
-While focusing on Twitter data, we'll draw insights from biomedical NER challenges where:
-- Entity boundaries often have multiple legal variations
-- Exact matching may penalize systems that correctly identify entities but don't match human annotation precisely
-- Ambiguous boundaries make flexible evaluation particularly useful
 
 ## References
 
