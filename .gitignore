@@ -185,6 +185,3 @@ resources/
 hw2_utils.py
 hw2.py
 tmp.model
-
-# trying other datasets
-wnut16/
