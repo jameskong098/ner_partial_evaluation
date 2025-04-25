@@ -11,7 +11,7 @@ from tqdm import tqdm
 from scorer import Scorer
 
 
-def load_corpus(data_folder: str = 'broad_twitter_corpus', train_file='btc.train', test_file='btc.test', dev_file='use_this.dev', delim = "\t", debug: bool = False) -> Corpus:
+def load_corpus(data_folder: str = 'broad_twitter_corpus', train_file='train.txt', test_file='test.txt', dev_file='dev.txt', delim = "\t", debug: bool = False) -> Corpus:
     # dataset format
     columns = {0: 'text', 1: 'ner'}
 
@@ -20,6 +20,13 @@ def load_corpus(data_folder: str = 'broad_twitter_corpus', train_file='btc.train
 
     if debug:
         return corpus.downsample(0.1)
+    
+    print(corpus.obtain_statistics())
+
+    sentences = corpus.get_all_sentences()
+
+    for sentence in sentences:
+        print(sentence)
     
     return corpus
 
