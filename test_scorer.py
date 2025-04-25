@@ -94,3 +94,7 @@ class TestOverlap(unittest.TestCase):
     # TODO
     pass
 
+
+class TestMerge(unittest.TestCase):
+    # TODO
+    pass

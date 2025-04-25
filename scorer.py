@@ -25,6 +25,8 @@ class Scorer:
         reference_set = set(reference)
         predictions_set = set(predictions)
 
+        # TODO consider a different way to store the counts: dictionary?
+
         # strict evaluation
         self.true_positives = len(reference_set & predictions_set)
         self.false_positives = len(predictions_set - reference_set)
@@ -34,13 +36,13 @@ class Scorer:
         self.reference = list(reference)
         self.predictions = list(predictions)
 
-        self.left_match_tp = 0
-        self.right_match_tp = 0
-        self.partial_match_tp = 0
-        self.type_match_tp = 0
-        self.overlap_scores = 0.0
+        # self.left_match_tp = 0
+        # self.right_match_tp = 0
+        # self.partial_match_tp = 0
+        # self.type_match_tp = 0
+        # self.overlap_scores = 0.0
         
-        self._compute_partial_matches()
+        # self._compute_partial_matches()
 
         left_reference_set = set([(mention.start) for mention in reference])
         left_predictions_set = set([(mention.start) for mention in predictions])
@@ -123,16 +125,22 @@ class Scorer:
         partial_match_fn = 0
         unmatched_references = list(self.reference)
         matched_predictions = set()
-        for prediction in self.predictions:
-            i = 0
-            match_found = False
-            while i < len(unmatched_references) and not match_found: # first match approach
-                if self.__has_overlap(prediction, unmatched_references[i]): # TODO modify here to include type matches
-                    partial_match_tp += 1
-                    unmatched_references.pop(i)
-                    matched_predictions.add(prediction)
-                    match_found = True
-                i += 1
+        with open("partial_matches.csv", mode="a", encoding="utf8") as file:
+            for prediction in self.predictions:
+                i = 0
+                match_found = False
+                while i < len(unmatched_references) and not match_found: # first match approach
+                    if self.__has_overlap(prediction, unmatched_references[i]): # TODO modify here to include type matches
+                        partial_match_tp += 1
+
+                        if unmatched_references[i].text != prediction.text:
+                            # write partial matches to file for review
+                            file.write(unmatched_references[i].text + "," + prediction.text+"\n")
+
+                        unmatched_references.pop(i)
+                        matched_predictions.add(prediction)
+                        match_found = True
+                    i += 1
         partial_match_fp = len(set(self.predictions) - matched_predictions)
         partial_match_fn = len(unmatched_references)
 
@@ -325,27 +333,39 @@ class Scorer:
             return 0.0
         return (2 * precision * recall) / (precision + recall)
 
-    def merge(self, other_scorer: "Scorer") -> None: # TODO fix this
+    def merge(self, other_scorer: "Scorer") -> None:
         """
         Adds the other Scorer's counts to this one.
         """
         self.true_positives += other_scorer.true_positives
         self.false_positives += other_scorer.false_positives
         self.false_negatives += other_scorer.false_negatives
-        
+        # self.left_match_tp += other_scorer.left_match_tp
+        # self.right_match_tp += other_scorer.right_match_tp
+        # self.partial_match_tp += other_scorer.partial_match_tp
+        # self.type_match_tp += other_scorer.type_match_tp
+        # self.overlap_scores += other_scorer.overlap_scores
         self.left_match_tp += other_scorer.left_match_tp
+        self.left_match_fp += other_scorer.left_match_fp
+        self.left_match_fn += other_scorer.left_match_fn
+
         self.right_match_tp += other_scorer.right_match_tp
+        self.right_match_fp += other_scorer.right_match_fp
+        self.right_match_fn += other_scorer.left_match_fn
+
         self.partial_match_tp += other_scorer.partial_match_tp
-        self.type_match_tp += other_scorer.type_match_tp
-        self.overlap_scores += other_scorer.overlap_scores
+        self.partial_match_fp += other_scorer.partial_match_fp
+        self.partial_match_fn += other_scorer.partial_match_fn
         
         # Append the raw mentions for potential recomputation
         self.reference.extend(other_scorer.reference)
         self.predictions.extend(other_scorer.predictions)
 
-    def score_report():
-        pass # TODO return all the f1 scores or something like that
-
+    def print_score_report(self): # TODO improve formatting
+        print("Exact:", self.f1_score())
+        print("Left:", self.left_match_f1())
+        print("Right", self.right_match_f1())
+        print("Partial", self.partial_match_f1())
 
     @staticmethod
     def create_mentions(labels: Sequence[Label]) -> list[Mention]:
