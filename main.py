@@ -37,19 +37,21 @@ embedding_types = [
 embeddings = StackedEmbeddings(embeddings=embedding_types)
 
 # TODO before next train, try adding tag_format = 'BIO' - by default, this is using BIOES
+# Tested the boave and BIO slightly better in accuracy and F-score micro but worse in F-score macro
 tagger = SequenceTagger(hidden_size=256,
                         embeddings=embeddings,
                         tag_dictionary=label_dict,
-                        tag_type=label_type)
+                        tag_type=label_type,
+                        tag_format='BIO',)
 
 trainer = ModelTrainer(tagger, corpus)
 
-# trainer.train('resources/taggers/sota-ner-flair',
-#               learning_rate=0.1,
-#               mini_batch_size=32,
-#               max_epochs=150)
+trainer.train('resources/taggers/sota-ner-flair',
+               learning_rate=0.1,
+               mini_batch_size=32,
+               max_epochs=150)
 
-model = SequenceTagger.load(os.path.join('resources', 'taggers', 'sota-ner-flair', 'final-model.pt'))
+model = SequenceTagger.load(os.path.join('resources', 'taggers', 'sota-ner-flair', 'best-model.pt'))
 
 
 def perform_error_analysis(model, corpus, output_file='error_analysis.txt'):
@@ -198,4 +200,8 @@ def perform_error_analysis(model, corpus, output_file='error_analysis.txt'):
 # print(f"Overlap - Precision: {scores.overlap_precision():.4f}, Recall: {scores.overlap_recall():.4f}")
 
 # perform_error_analysis(model, corpus, output_file='ner_error_analysis.txt')
-perform_error_analysis(model, corpus, output_file='ner_error_analysis_2.txt')
+# perform_error_analysis(model, corpus, output_file='ner_error_analysis_2.txt')
+
+# Evaluate using Flair's built-in method for token-level metrics
+result = model.evaluate(data_points=corpus.test, gold_label_type='ner', mini_batch_size=32) # Use test set for final evaluation
+print(result.detailed_results) # This often includes token-level accuracy if calculated by Flair
