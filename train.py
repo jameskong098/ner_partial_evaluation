@@ -21,24 +21,23 @@ def load_corpus(data_folder: str = 'broad_twitter_corpus', train_file='train.txt
     if debug:
         return corpus.downsample(0.1)
     
-    print(corpus.obtain_statistics())
+    # print(corpus.obtain_statistics())
 
-    sentences = corpus.get_all_sentences()
+    # sentences = corpus.get_all_sentences()
 
-    for sentence in sentences:
-        print(sentence)
+    # for sentence in sentences:
+    #     print(sentence)
     
     return corpus
 
 
 def train_model(corpus: Corpus) -> None:
-    # TODO this model is from the flair tutorial and is not tuned
 
     embedding_types = [
-        WordEmbeddings('twitter'),
-        CharacterEmbeddings(),
-        FlairEmbeddings('news-forward'),
-        FlairEmbeddings('news-backward'),
+        WordEmbeddings('twitter'), # should compare results from this to CRF, then add stacked embeddings - after 10 epochs scores should be stable, learning rate is a little high, 20 epochs should be good to get started
+        # CharacterEmbeddings(), # 70 is "not unreasonable" for accuracy on twitter data
+        # FlairEmbeddings('news-forward'),
+        # FlairEmbeddings('news-backward'),
     ]
 
     embeddings = StackedEmbeddings(embeddings=embedding_types)
@@ -72,11 +71,13 @@ def grid_search(corpus: Corpus, params) -> None:
 
 if __name__ == "__main__":
     # load corpus
-    corpus = load_corpus()
+    corpus = load_corpus(debug=True)
+    print(corpus)
 
     # extract the labels from the corpus
     label_type = 'ner'
-    label_dict = corpus.make_label_dictionary(label_type=label_type, add_unk=True)
+    label_dict = corpus.make_label_dictionary(label_type=label_type, add_unk=False)
+    print(label_dict)
 
     # train model
     train_model(corpus)
