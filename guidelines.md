@@ -1,4 +1,4 @@
-## Notes on Partial Credit
+# Notes on Partial Credit
 
 It doesn't make sense to award full credit for partial matches, because it incentivizes mistakes. We want a model to accurately identify named entities in text, so awarding the same credit to an exact and impartial match is not a good idea. On the other hand, mention F1 penalizes close guesses, which may still be useful.
 
@@ -6,18 +6,18 @@ It doesn't make sense to award full credit for partial matches, because it incen
 2. What % of partial matches are good?
     - Use guidelines
 
-# If we want to award partial credit, how much?
+## If we want to award partial credit, how much?
 - At what rate are partial matches "good"?
     - Review guidelines
     - Is a constant rate of partial credit appropriate?
 - Can we award partial credit based on closeness to gold annotations?
     - Overlap percentage
 
-## Guidelines: What Makes a Good Partial Match?
+# Guidelines: What Makes a Good Partial Match?
 * Partial match clearly refers to the same entity
 * Partial match does not include extra meaningful context, which changes meaning or contains unncessessary information
 
-# Examples
+## Examples
 | Quality | Gold             | Prediction         |
 |---------|------------------|--------------------|
 | Good    | The New York Times | New York Times     |
