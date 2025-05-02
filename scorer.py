@@ -59,7 +59,7 @@ class Scorer:
         self.right_match_fp = len(right_predictions_set - right_reference_set)
         self.right_match_fn = len(right_reference_set - right_predictions_set)
 
-        self.partial_match_tp, self.partial_match_fp, self.partial_match_fn, self.partial_credit_dict = self.__count_partial_matches()
+        self.partial_match_tp, self.partial_match_fp, self.partial_match_fn, self.partial_credit_list = self.__count_partial_matches()
 
         self.overlap_credict_dict = {}
         
@@ -128,7 +128,7 @@ class Scorer:
         partial_match_tp = 0
         partial_match_fp = 0
         partial_match_fn = 0
-        partial_credit_dict = {}
+        partial_credit_list = []
 
         unmatched_references = list(self.reference)
         matched_predictions = set()
@@ -145,7 +145,7 @@ class Scorer:
                     partial_match_tp += credit
 
                     # TODO there is prob better way to do this
-                    partial_credit_dict[reference] = (prediction, credit)
+                    partial_credit_list.append((reference, prediction, credit))
 
                     unmatched_references.pop(i)
                     matched_predictions.add(prediction)
@@ -154,7 +154,7 @@ class Scorer:
         partial_match_fp = len(set(self.predictions) - matched_predictions)
         partial_match_fn = len(unmatched_references)
 
-        return partial_match_tp, partial_match_fp, partial_match_fn, partial_credit_dict
+        return partial_match_tp, partial_match_fp, partial_match_fn, partial_credit_list
 
     def __has_overlap(self, first: Mention, second: Mention) -> bool:
         """
@@ -265,10 +265,10 @@ class Scorer:
         return (2 * precision * recall) / (precision + recall)
     
     def partial_credit_ratio(self) -> float:
-        total = len(self.partial_credit_dict)
+        total = len(self.partial_credit_list)
         partial_count = 0
-        for mention in self.partial_credit_dict:
-            if self.partial_credit_dict[mention][1] != 1:
+        for mention in self.partial_credit_list:
+            if mention[2] != 1:
                 partial_count += 1
         if total == 0:
             return 0.0
@@ -323,6 +323,11 @@ class Scorer:
         self.partial_match_tp += other_scorer.partial_match_tp
         self.partial_match_fp += other_scorer.partial_match_fp
         self.partial_match_fn += other_scorer.partial_match_fn
+
+        self.partial_credit_list.extend(other_scorer.partial_credit_list)
+
+        self.possible += other_scorer.possible
+        self.actual += other_scorer.actual
         
         # Append the raw mentions for potential recomputation
         self.reference.extend(other_scorer.reference)
@@ -338,9 +343,9 @@ class Scorer:
     def write_partial_matches(self, path: str) -> None:
         with open(path, mode='w', encoding='utf8') as file:
             file.write("gold, prediction, credit\n")
-            for reference in self.partial_credit_dict:
-                prediction, credit = self.partial_credit_dict[reference]
-                file.write(reference.text + "," + prediction.text + "," + str(credit) + "\n")
+            for match in self.partial_credit_list:
+                gold, prediction, credit = match
+                file.write(gold.text + "," + prediction.text + "," + str(credit) + "\n")
 
     @staticmethod
     def create_mentions(labels: Sequence[Label]) -> list[Mention]:

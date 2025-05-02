@@ -104,3 +104,4 @@ if __name__ == "__main__":
     corpus = load_corpus()
     scores = scorer_evaluate(corpus.dev, predictions)
     scores.print_score_report()
+    scores.write_partial_matches("predictions/partial.csv")
