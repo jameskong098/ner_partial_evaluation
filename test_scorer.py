@@ -97,5 +97,23 @@ class TestOverlap(unittest.TestCase):
 
 
 class TestMerge(unittest.TestCase):
-    # TODO
-    pass
+    def test_merge_exact_match(self) -> None:
+        reference = [Mention("PER", 0, 2, "Allen Iverson"), Mention("ORG", 2, 3, "Meta"), Mention("LOC", 4, 6, "San Francisco")]
+        prediction = [Mention("PER", 0, 2, "Allen Iverson"), Mention("ORG", 3, 5, "said San")]
+        scores = Scorer(reference, prediction)
+        reference_two = [Mention("PER", 0, 2, "Allen Iverson"), Mention("ORG", 2, 3, "Meta"), Mention("LOC", 4, 6, "San Francisco")]
+        prediction_two = [Mention("PER", 0, 2, "Allen Iverson"), Mention("ORG", 2, 3, "Meta")]
+        other = Scorer(reference_two, prediction_two)
+        scores.merge(other)
+        self.assertEqual(3, scores.true_positives)
+        self.assertEqual(1, scores.false_positives)
+        self.assertEqual(3, scores.false_negatives)
+
+        self.assertAlmostEqual(0.6, scores.f1_score())
+
+    def test_merge_starting_empty(self) -> None:
+        reference = [Mention("PER", 0, 2, "Allen Iverson"), Mention("ORG", 2, 3, "Meta"), Mention("LOC", 4, 6, "San Francisco")]
+        predictions = [Mention("PER", 0, 2, "Allen Iverson"), Mention("ORG", 3, 5, "said San")]
+        scores = Scorer([], [])
+        scores.merge(Scorer(reference, predictions))
+        self.assertAlmostEqual(2/5, scores.f1_score())
