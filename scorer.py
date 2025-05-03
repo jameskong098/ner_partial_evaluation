@@ -329,9 +329,9 @@ class Scorer:
         self.possible += other_scorer.possible
         self.actual += other_scorer.actual
         
-        # Append the raw mentions for potential recomputation
-        self.reference.extend(other_scorer.reference)
-        self.predictions.extend(other_scorer.predictions)
+        # # Append the raw mentions for potential recomputation
+        # self.reference.extend(other_scorer.reference)
+        # self.predictions.extend(other_scorer.predictions)
 
     def print_score_report(self):
         print(f"Exact F1: {self.f1_score() * 100:0.2f}")
