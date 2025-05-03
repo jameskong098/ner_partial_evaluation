@@ -111,6 +111,19 @@ class TestMerge(unittest.TestCase):
 
         self.assertAlmostEqual(0.6, scores.f1_score())
 
+    def test_merge_partial_match(self) -> None:
+        reference = [Mention("PER", 0, 2, "Allen Iverson"), Mention("ORG", 2, 3, "Meta"), Mention("LOC", 4, 6, "San Francisco")]
+        prediction = [Mention("PER", 0, 2, "Allen Iverson"), Mention("ORG", 3, 5, "said San")]
+        scores = Scorer(reference, prediction)
+        self.assertAlmostEqual(1.5, scores.partial_match_tp)
+        reference_two = [Mention("PER", 0, 2, "Allen Iverson"), Mention("ORG", 2, 3, "Meta"), Mention("LOC", 4, 6, "San Francisco")]
+        prediction_two = [Mention("PER", 0, 2, "Allen Iverson"), Mention("ORG", 2, 3, "Meta")]
+        other = Scorer(reference_two, prediction_two)
+        scores.merge(other)
+        self.assertAlmostEqual(7/8, scores.partial_match_precision())
+        self.assertAlmostEqual(3.5/6, scores.partial_match_recall())
+        self.assertAlmostEqual(7/10, scores.partial_match_f1())
+    
     def test_merge_starting_empty(self) -> None:
         reference = [Mention("PER", 0, 2, "Allen Iverson"), Mention("ORG", 2, 3, "Meta"), Mention("LOC", 4, 6, "San Francisco")]
         predictions = [Mention("PER", 0, 2, "Allen Iverson"), Mention("ORG", 3, 5, "said San")]
