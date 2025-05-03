@@ -14,7 +14,7 @@ It may not make sense to award full credit for partial matches, because it incen
     - Overlap percentage
 
 # Guidelines: What Makes a Good Partial Match?
-* Partial match clearly refers to the same entity
+* A partial match clearly refers to the same entity and does not miss significant context. For example, "Ben" vs. "Big Ben" is a bad match because "Ben" could refer to a person rather than the building.
 * Partial match does not include extra meaningful context, which changes meaning or contains unncessessary information
 
 ## Examples
@@ -22,5 +22,6 @@ It may not make sense to award full credit for partial matches, because it incen
 |---------|------------------|--------------------|
 | Good    | The New York Times | New York Times     |
 | Bad     | Premier League   | Premier League club |
+| Bad     | Big Ben   | Ben |
 | Good    | Sprint           | Sprint Network     |
 | Good    | @eBay            | eBay               |
