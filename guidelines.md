@@ -1,6 +1,6 @@
 # Notes on Partial Credit
 
-It doesn't make sense to award full credit for partial matches, because it incentivizes mistakes. We want a model to accurately identify named entities in text, so awarding the same credit to an exact and impartial match is not a good idea. On the other hand, mention F1 penalizes close guesses, which may still be useful.
+It may not make sense to award full credit for partial matches, because it incentivizes mistakes. We want a model to accurately identify named entities in text, so awarding the same credit to an exact and impartial may not be a good idea. On the other hand, mention F1 penalizes close guesses, which may still be useful.
 
 1. For partial matching metrics, first look at what % of matches are partial. The metric is only useful if there is partial credit to award.
 2. What % of partial matches are good?

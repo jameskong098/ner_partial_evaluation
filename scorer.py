@@ -124,7 +124,7 @@ class Scorer:
             if pred_type in ref_types:
                 self.type_match_tp += 1
     
-    def __count_partial_matches(self) -> tuple[int, int, int]:
+    def __count_partial_matches(self) -> tuple[int, int, int]: # TODO this is not working correctly
         partial_match_tp = 0
         partial_match_fp = 0
         partial_match_fn = 0
