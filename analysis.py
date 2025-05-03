@@ -41,45 +41,6 @@ def scorer_evaluate(reference, predictions):
     return scores
 
 
-# def write_conll(sentences, path):
-#     """
-#     Writes predictions to the specified path in CONLL format
-#     """
-#     for sentence in sentences:
-#         for token in sentence:
-#             if token.to_dict("ner")["labels"] == []:
-#                 token.add_label(typename = "ner", value = "O") 
-
-#     with open(path, mode="w", encoding="utf8") as file:
-#         for sentence in sentences:
-#             for i, token in enumerate(sentence):
-#                 file.write(token.text)
-#                 file.write("\t")
-#                 file.write(token.to_dict("ner")["labels"][0]["value"])
-#                 file.write("\n")
-#             file.write("\n")
-
-
-# # the accuracy found here is different than what Flair reports
-# def check_accuracy(gold, pred):
-#     """
-#     Finds the accuracy of CONLL format tagged data in pred, comparing to gold
-#     """
-#     correct = 0
-#     total = 0
-#     with open(gold, encoding="utf8") as reference, open(pred, encoding="utf8") as prediction:
-#         for line1, line2 in zip(reference, prediction):
-#             if not (line1.strip("\n") == "" or line2.strip("\n") == ""):
-#                 gold_tok = line1.rstrip().split("\t")[1]
-#                 pred_tok = line2.rstrip().split("\t")[1]
-#                 if gold_tok == pred_tok:
-#                     correct +=1
-#                 total += 1
-
-#     # compute microavg acc
-#     print(f"Accuracy: {correct/total}")
-
-
 if __name__ == "__main__":
     # load corpus
     corpus = load_corpus()
@@ -92,10 +53,6 @@ if __name__ == "__main__":
     # load model from file
     model = SequenceTagger.load(os.path.join('model', 'best-model.pt'))
 
-    # evaluate with flair
-    result = model.evaluate(data_points=corpus.dev, gold_label_type=label_type, gold_label_dictionary=label_dict)
-    print(result.detailed_results)
-
     # evaluate with our Scorer
     predictions = predict(data_points=corpus.dev, model=model, batch_size=32)   
 
@@ -104,4 +61,11 @@ if __name__ == "__main__":
     corpus = load_corpus()
     scores = scorer_evaluate(corpus.dev, predictions)
     scores.print_score_report()
-    scores.write_partial_matches("predictions/partial.csv")
+    scores.write_partial_matches("predictions/partial_dev.csv")
+
+    # evaluate with Flair
+    # do this AFTER our evaluation, since Corpus is modified
+    result = model.evaluate(data_points=corpus.dev, gold_label_type=label_type, gold_label_dictionary=label_dict)
+    print(result.detailed_results)
+
+    # repeat this process on the test set
