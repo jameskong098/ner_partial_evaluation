@@ -13,52 +13,46 @@ The dataset contains predictions for named entity recognition (NER) tasks, where
 
 | Gold Entity                                           | Predicted Entity                          | Credit | Analysis                                      |
 |-------------------------------------------------------|-------------------------------------------|--------|----------------------------------------------|
-| New Hampshire                                         | Hampshire                                 | 0.5    | Appropriate: Captures part of the entity     |
-| The Health and Safety Executive                      | Health and Safety Executive               | 0.5    | Appropriate: Matches the full entity         |
-| Universidade Federal do Tocantins                    | Universidade Federal                      | 0.5    | Appropriate: Captures the main part but omits context |
-| VERIZON WIRELESS                                     | VERIZON                                   | 0.5    | Appropriate: Captures the main part but omits context |
-| Philips AVENT                                        | Philips                                   | 0.5    | Too Generous: Overly general prediction      |
-| Yume & Co                                            | Yume & Co Grimsby                         | 0.5    | Appropriate: Includes extraneous information but core entity is present |
-| Grimsby                                              | Yume & Co Grimsby                         | 0.5    | Too Generous: Prediction does not match the gold entity |
-| @ MarylandMSoccer                                    | MarylandMSoccer                           | 0.5    | Appropriate: Matches the entity, missing only the @ symbol |
-| Venezuela #SOSVenezuela #OscarsForVenezuela          | Venezuela                                 | 0.5    | Too Generous: Missing significant context    |
-| @ john                                               | john                                      | 0.5    | Appropriate: Matches the entity, missing only the @ symbol |
-| @ justinbieber @ scooterbraun @ Ludacris             | @ justinbieber                            | 0.5    | Too Generous: Missing significant context    |
-| Big Ben                                              | Ben                                       | 0.5    | Too Generous: "Ben" is overly general        |
-| SAM C                                                | SAM                                       | 0.5    | Appropriate: Captures most of the entity     |
-| Eric Plott Eric Plott Patricia Plott E . G . Plott   | Eric Plott Eric Plott Patricia Plott      | 0.5    | Appropriate: Captures most of the entity     |
-| Blink Technologies , Inc .                           | Blink Technologies                        | 0.5    | Appropriate: Captures the main entity        |
-| Tour De Chesapeake                                   | Chesapeake                                | 0.5    | Too Generous: Overly general prediction      |
-| Gurudev                                              | Gurudev #yoga                             | 0.5    | Appropriate: Includes extraneous information but core entity is present |
-| Kim Seung Soo Bertolak                               | Kim Seung                                 | 0.5    | Too Generous: Missing significant context    |
-| T . W . Shannon                                      | Shannon                                   | 0.5    | Too Generous: Missing significant context    |
-| Austin Mahone #AustinMahone                          | Austin Mahone                             | 0.5    | Appropriate: Captures the main entity        |
-| Cassese 's                                           | Cassese                                  | 0.5    | Appropriate: Matches the entity              |
-| NY )                                                 | NY                                        | 0.5    | Appropriate: Matches the entity              |
-| @ followBack_080                                     | followBack_080                            | 0.5    | Appropriate: Matches the entity, missing only the @ symbol |
-| @ oln_9                                              | oln_9                                     | 0.5    | Appropriate: Matches the entity, missing only the @ symbol |
-| @ butchey12                                          | butchey12                                 | 0.5    | Appropriate: Matches the entity, missing only the @ symbol |
-| @ Symposiu                                           | Symposiu                                  | 0.5    | Appropriate: Matches the entity, missing only the @ symbol |
-| #Pirate n ' Princess Vacations                      | #Pirate                                   | 0.5    | Too Generous: Missing significant context    |
+| New Hampshire                                         | Hampshire                                 | 0.5    | Good: Refers to the same entity              |
+| The Health and Safety Executive                      | Health and Safety Executive               | 0.5    | Good: Refers to the same entity              |
+| Universidade Federal do Tocantins                    | Universidade Federal                      | 0.5    | Good: Refers to the same entity but omits context |
+| VERIZON WIRELESS                                     | VERIZON                                   | 0.5    | Good: Refers to the same entity but omits context |
+| Philips AVENT                                        | Philips                                   | 0.5    | Bad: Overly general, could refer to other entities |
+| Yume & Co                                            | Yume & Co Grimsby                         | 0.5    | Bad: Adds extraneous information            |
+| Grimsby                                              | Yume & Co Grimsby                         | 0.5    | Bad: Does not refer to the same entity       |
+| @ MarylandMSoccer                                    | MarylandMSoccer                           | 0.5    | Good: Refers to the same entity, missing only the @ symbol |
+| Venezuela #SOSVenezuela #OscarsForVenezuela          | Venezuela                                 | 0.5    | Good: Refers to the same entity              |               |
+| @ john                                               | john                                      | 0.5    | Good: Refers to the same entity, missing only the @ symbol |
+| @ justinbieber @ scooterbraun @ Ludacris             | @ justinbieber                            | 0.5    | Good: Refers to the same entity                            |
+| Big Ben                                              | Ben                                       | 0.5    | Good: Refers to the same entity              | |
+| SAM C                                                | SAM                                       | 0.5    | Good: Refers to the same entity              |
+| Eric Plott Eric Plott Patricia Plott E . G . Plott   | Eric Plott Eric Plott Patricia Plott      | 0.5    | Good: Refers to the same entity              |
+| Blink Technologies , Inc .                           | Blink Technologies                        | 0.5    | Good: Refers to the same entity              |
+| Tour De Chesapeake                                   | Chesapeake                                | 0.5    | Good: Refers to the same entity              | |
+| Gurudev                                              | Gurudev #yoga                             | 0.5    | Good: Refers to the same entity              |            |
+| Kim Seung Soo Bertolak                               | Kim Seung                                 | 0.5    | Good: Refers to the same entity              |
+| T . W . Shannon                                      | Shannon                                   | 0.5    | Good: Refers to the same entity              |
+| Austin Mahone #AustinMahone                          | Austin Mahone                             | 0.5    | Good: Refers to the same entity              |
+| Cassese 's                                           | Cassese                                  | 0.5    | Good: Refers to the same entity              |
+| NY )                                                 | NY                                        | 0.5    | Good: Refers to the same entity              |
+| @ followBack_080                                     | followBack_080                            | 0.5    | Good: Refers to the same entity, missing only the @ symbol |
+| @ oln_9                                              | oln_9                                     | 0.5    | Good: Refers to the same entity, missing only the @ symbol |
+| @ butchey12                                          | butchey12                                 | 0.5    | Good: Refers to the same entity, missing only the @ symbol |
+| @ Symposiu                                           | Symposiu                                  | 0.5    | Good: Refers to the same entity, missing only the @ symbol |
+| #Pirate n ' Princess Vacations                      | #Pirate                                   | 0.5    | Good: Refers to the same entity              |               |
 
 ## Analysis
 
 ### Observations
-1. **Exact Matches**:
-   - Predictions that match the gold entity exactly or with minor differences (e.g., missing symbols like `@`) are appropriately awarded partial credit (e.g., "@ john" → "john").
+1. **Good Partial Matches**:
+   - Predictions that clearly refer to the same entity as the gold annotation are considered good matches (e.g., "New Hampshire" → "Hampshire").
+   - Minor omissions, such as missing symbols like `@`, do not significantly affect the meaning (e.g., "@ john" → "john").
 
-2. **Partial Matches with Context Omission**:
-   - Predictions that capture the main part of the entity but omit critical context (e.g., "Universidade Federal do Tocantins" → "Universidade Federal") are reasonably awarded partial credit, though a dynamic scoring system could better reflect the degree of overlap.
+2. **Bad Partial Matches**:
+   - Predictions that omit significant context or add extraneous information are considered bad matches (e.g., "Venezuela #SOSVenezuela #OscarsForVenezuela" → "Venezuela").
 
-3. **Overly General Predictions**:
-   - Predictions that are overly general (e.g., "Ben" for "Big Ben") are awarded partial credit too generously. These predictions fail to capture the specificity of the gold entity. Ben could be referring to a person's name instead of the building.
+3. **Extraneous Additions**:
+   - Predictions that include unnecessary information (e.g., "Yume & Co Grimsby" → "Yume & Co") are bad matches if the added information changes the meaning.
 
-4. **Extraneous Additions**:
-   - Predictions that include extraneous information but still contain the core entity (e.g., "Yume & Co Grimsby" for "Yume & Co") are appropriately awarded partial credit.
-
-5. **Significant Context Loss**:
-   - Predictions that lose significant context (e.g., "Venezuela #SOSVenezuela #OscarsForVenezuela" → "Venezuela") are awarded partial credit too generously, as the omitted context is crucial to the entity's meaning.
-
-## Conclusion
-
-The current partial credit system (fixed at 0.5) is a reasonable baseline but lacks nuance. A more dynamic scoring system could better reflect the quality of partial matches and improve evaluation accuracy.
+4. **Context Omission**:
+   - Predictions that omit critical context but still refer to the same entity (e.g., "Universidade Federal do Tocantins" → "Universidade Federal") are acceptable but could benefit from a dynamic scoring system.
