@@ -71,7 +71,7 @@ def grid_search(corpus: Corpus, params) -> None:
 
 if __name__ == "__main__":
     # load corpus
-    corpus = load_corpus(debug=True)
+    corpus = load_corpus()
     print(corpus)
 
     # extract the labels from the corpus

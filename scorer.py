@@ -36,6 +36,9 @@ class Scorer:
         self.reference = list(reference)
         self.predictions = list(predictions)
 
+        self.possible = len(self.reference) # used for recall
+        self.actual = len(self.predictions) # used for precision
+
         # self.left_match_tp = 0
         # self.right_match_tp = 0
         # self.partial_match_tp = 0
@@ -56,7 +59,9 @@ class Scorer:
         self.right_match_fp = len(right_predictions_set - right_reference_set)
         self.right_match_fn = len(right_reference_set - right_predictions_set)
 
-        self.partial_match_tp, self.partial_match_fp, self.partial_match_fn = self.__count_partial_matches()
+        self.partial_match_tp, self.partial_match_fp, self.partial_match_fn, self.partial_credit_list = self.__count_partial_matches()
+
+        self.overlap_credict_dict = {}
         
     def _compute_partial_matches(self) -> None:
         """
@@ -119,32 +124,37 @@ class Scorer:
             if pred_type in ref_types:
                 self.type_match_tp += 1
     
-    def __count_partial_matches(self) -> tuple[int, int, int]:
+    def __count_partial_matches(self) -> tuple[int, int, int]: # TODO this is not working correctly
         partial_match_tp = 0
         partial_match_fp = 0
         partial_match_fn = 0
+        partial_credit_list = []
+
         unmatched_references = list(self.reference)
         matched_predictions = set()
-        with open("partial_matches.csv", mode="a", encoding="utf8") as file:
-            for prediction in self.predictions:
-                i = 0
-                match_found = False
-                while i < len(unmatched_references) and not match_found: # first match approach
-                    if self.__has_overlap(prediction, unmatched_references[i]): # TODO modify here to include type matches
-                        partial_match_tp += 1
+        for prediction in self.predictions:
+            i = 0
+            match_found = False
+            while i < len(unmatched_references) and not match_found: # first match approach
+                reference = unmatched_references[i]
+                if self.__has_overlap(prediction, reference):
+                    if prediction.start == reference.start and prediction.end == reference.end:
+                        credit = 1
+                    else:
+                        credit = 0.5 # overlap w/o exact boundary match = 0.5 credit
+                    partial_match_tp += credit
 
-                        if unmatched_references[i].text != prediction.text:
-                            # write partial matches to file for review
-                            file.write(unmatched_references[i].text + "," + prediction.text+"\n")
+                    # TODO there is prob better way to do this
+                    partial_credit_list.append((reference, prediction, credit))
 
-                        unmatched_references.pop(i)
-                        matched_predictions.add(prediction)
-                        match_found = True
-                    i += 1
+                    unmatched_references.pop(i)
+                    matched_predictions.add(prediction)
+                    match_found = True
+                i += 1
         partial_match_fp = len(set(self.predictions) - matched_predictions)
         partial_match_fn = len(unmatched_references)
 
-        return (partial_match_tp, partial_match_fp, partial_match_fn)
+        return partial_match_tp, partial_match_fp, partial_match_fn, partial_credit_list
 
     def __has_overlap(self, first: Mention, second: Mention) -> bool:
         """
@@ -227,49 +237,22 @@ class Scorer:
         if precision + recall == 0:
             return 0.0
         return (2 * precision * recall) / (precision + recall)
-    
 
-    # def right_match_precision(self) -> float:
-    #     """
-    #     Precision for right boundary matches.
-    #     """
-    #     if len(self.predictions) == 0:
-    #         return 0.0
-    #     return self.right_match_tp / len(self.predictions)
-    
-    # def right_match_recall(self) -> float:
-    #     """
-    #     Recall for right boundary matches.
-    #     """
-    #     if len(self.reference) == 0:
-    #         return 0.0
-    #     return self.right_match_tp / len(self.reference)
-    
-    # def right_match_f1(self) -> float:
-    #     """
-    #     F1 score for right boundary matches.
-    #     """
-    #     precision = self.right_match_precision()
-    #     recall = self.right_match_recall()
-    #     if precision + recall == 0:
-    #         return 0.0
-    #     return (2 * precision * recall) / (precision + recall)
-    
     def partial_match_precision(self) -> float:
         """
         Precision for left boundary matches.
         """
-        if self.partial_match_tp + self.partial_match_fp == 0:
+        if self.actual == 0:
             return 0.0
-        return self.partial_match_tp / (self.partial_match_tp + self.partial_match_fp)
+        return self.partial_match_tp / self.actual
     
     def partial_match_recall(self) -> float:
         """
         Recall for left boundary matches.
         """
-        if self.partial_match_tp + self.partial_match_fn == 0:
+        if self.possible == 0:
             return 0.0
-        return self.partial_match_tp / (self.partial_match_tp + self.partial_match_fn)
+        return self.partial_match_tp / self.possible
     
     def partial_match_f1(self) -> float:
         """
@@ -281,31 +264,15 @@ class Scorer:
             return 0.0
         return (2 * precision * recall) / (precision + recall)
     
-    # def partial_match_precision(self) -> float:
-    #     """
-    #     Precision for partial span overlap.
-    #     """
-    #     if len(self.predictions) == 0:
-    #         return 0.0
-    #     return self.partial_match_tp / len(self.predictions)
-    
-    # def partial_match_recall(self) -> float:
-    #     """
-    #     Recall for partial span overlap.
-    #     """
-    #     if len(self.reference) == 0:
-    #         return 0.0
-    #     return self.partial_match_tp / len(self.reference)
-    
-    # def partial_match_f1(self) -> float:
-    #     """
-    #     F1 score for partial span overlap.
-    #     """
-    #     precision = self.partial_match_precision()
-    #     recall = self.partial_match_recall()
-    #     if precision + recall == 0:
-    #         return 0.0
-        return (2 * precision * recall) / (precision + recall)
+    def partial_credit_ratio(self) -> float:
+        total = len(self.partial_credit_list)
+        partial_count = 0
+        for mention in self.partial_credit_list:
+            if mention[2] != 1:
+                partial_count += 1
+        if total == 0:
+            return 0.0
+        return partial_count/total
     
     def overlap_precision(self) -> float:
         """
@@ -356,16 +323,29 @@ class Scorer:
         self.partial_match_tp += other_scorer.partial_match_tp
         self.partial_match_fp += other_scorer.partial_match_fp
         self.partial_match_fn += other_scorer.partial_match_fn
-        
-        # Append the raw mentions for potential recomputation
-        self.reference.extend(other_scorer.reference)
-        self.predictions.extend(other_scorer.predictions)
 
-    def print_score_report(self): # TODO improve formatting
+        self.partial_credit_list.extend(other_scorer.partial_credit_list)
+
+        self.possible += other_scorer.possible
+        self.actual += other_scorer.actual
+        
+        # # Append the raw mentions for potential recomputation
+        # self.reference.extend(other_scorer.reference)
+        # self.predictions.extend(other_scorer.predictions)
+
+    def print_score_report(self):
         print(f"Exact F1: {self.f1_score() * 100:0.2f}")
         print(f"Left match F1: {self.left_match_f1() * 100:0.2f}")
         print(f"Right match F1: {self.right_match_f1() * 100:0.2f}")
         print(f"Partial match F1: {self.partial_match_f1() * 100:0.2f}")
+        print(f"\tPercent given partial credit: {self.partial_credit_ratio() * 100:0.2f}")
+
+    def write_partial_matches(self, path: str) -> None:
+        with open(path, mode='w', encoding='utf8') as file:
+            file.write("gold, prediction, credit\n")
+            for match in self.partial_credit_list:
+                gold, prediction, credit = match
+                file.write(gold.text + "," + prediction.text + "," + str(credit) + "\n")
 
     @staticmethod
     def create_mentions(labels: Sequence[Label]) -> list[Mention]:
