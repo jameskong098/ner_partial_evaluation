@@ -62,6 +62,8 @@ if __name__ == "__main__":
     scores = scorer_evaluate(corpus.dev, predictions)
     scores.print_score_report()
     scores.write_partial_matches("predictions/partial_dev.csv")
+    # TODO add writing of left matches
+    # TODO add writing of right matches
 
     # evaluate with Flair
     # do this AFTER our evaluation, since Corpus is modified
