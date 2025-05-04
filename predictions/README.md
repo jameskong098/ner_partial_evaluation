@@ -15,7 +15,7 @@ Partial credit is awarded if the predicted entity string and the gold entity str
 | 3   | Universidade Federal do Tocantins                     | Universidade Federal                      | 0.5    | **Good**: Meaningful prefix                   |
 | 4   | VERIZON WIRELESS                                      | VERIZON                                   | 0.5    | **Good**: Core entity                         |
 | 5   | Philips AVENT                                         | Philips                                   | 0.5    | **Good**: Core entity                         |
-| 6   | Grimsby                                               | Yume & Co Grimsby                         | 0.5    | **Bad**: Different entity                     |
+| 6   | Grimsby                                               | Yume & Co Grimsby                         | 0.5    | **Bad**: Different entity and extraneous information                     |
 | 7   | @ firefox                                             | firefox                                   | 0.5    | **Good**: Missing symbol                      |
 | 8   | @ MarylandMSoccer                                     | MarylandMSoccer                           | 0.5    | **Good**: Missing symbol                      |
 | 9   | Venezuela #SOSVenezuela #OscarsForVenezuela           | Venezuela                                 | 0.5    | **Good**: Core entity, missing context        |
@@ -27,7 +27,7 @@ Partial credit is awarded if the predicted entity string and the gold entity str
 | 15  | "Blink Technologies , Inc ."                          | Blink Technologies                        | 0.5    | **Good**: Minor omission                      |
 | 16  | Gurudev                                               | Gurudev #yoga                             | 0.5    | **Good**: Gold is subset, core entity present |
 | 17  | Kim Seung Soo Bertolak                                | Kim Seung                                 | 0.5    | **Good**: Meaningful prefix                   |
-| 18  | Sprint                                                | Sprint Network                            | 0.5    | **Good**: Gold is subset, core entity present |
+| 18  | Sprint                                                | Sprint Network                            | 0.5    | **Bad**: Extraneous Info |
 | 19  | T . W . Shannon                                       | Shannon                                   | 0.5    | **Good**: Core entity                         |
 | 20  | Austin Mahone #AustinMahone                           | Austin Mahone                             | 0.5    | **Good**: Core entity, missing context        |
 | 21  | Cassese 's                                            | Cassese                                   | 0.5    | **Good**: Minor omission                      |
@@ -39,8 +39,8 @@ Partial credit is awarded if the predicted entity string and the gold entity str
 
 ### Analysis (Overlap - 0.5 Credit Only)
 
-- **Sample Quality**: 24 out of 26 (approx. 92.3%) examples show "Good" partial credit assignment based on semantic relevance among the 0.5 credit cases.
-- **Observations**: Simple overlap often awards credit appropriately when partial credit is due (approx. 92.3% of these cases). The few "Bad" cases involve significant loss of context ("New Hampshire" -> "Hampshire") or matching a different entity ("Grimsby" -> "Yume & Co Grimsby"). Most good cases involve missing symbols, minor omissions, identifying core entities, or meaningful prefixes/suffixes.
+- **Sample Quality**: 23 out of 26 (approx. 88.5%) examples show "Good" partial credit assignment based on semantic relevance among the 0.5 credit cases.
+- **Observations**: Simple overlap often awards credit appropriately when partial credit is due (approx. 88.5% of these cases). The few "Bad" cases involve significant loss of context ("New Hampshire" -> "Hampshire") or matching a different entity ("Grimsby" -> "Yume & Co Grimsby"). Most good cases involve missing symbols, minor omissions, identifying core entities, or meaningful prefixes/suffixes.
 
 ---
 
@@ -101,3 +101,13 @@ Partial credit is awarded if the predicted entity string matches the end of the 
 
 - **Sample Quality**: 12 out of 13 (approx. 92.3%) examples show "Good" partial credit assignment among the 0.5 credit cases.
 - **Observations**: Right boundary matching is also quite effective, similar to overlap. Most good cases involve missing prefix symbols or meaningful suffixes. The single "Bad" case involved a coincidental suffix match with a different entity. This strategy is useful for cases like "T. W. Shannon" -> "Shannon" or identifying the last entity in a list.
+
+This directory contains CSV files detailing partial matches found during evaluation on the development set.
+
+*   `partial_dev_overlap.csv`: Lists gold standard entities and predicted entities that have *any* token overlap (with the same entity type). Credit is 1.0 for exact matches and 0.5 for partial overlaps.
+*   `partial_dev_left_bound.csv`: Lists gold standard entities and predicted entities that share the *same starting token* (with the same entity type). Credit is 1.0 for exact matches and 0.5 if only the left boundary matches.
+*   `partial_dev_right_bound.csv`: Lists gold standard entities and predicted entities that share the *same ending token* (with the same entity type). Credit is 1.0 for exact matches and 0.5 if only the right boundary matches.
+
+## Visualizations
+
+A summary table and a comparison bar chart of the different evaluation metrics (Exact, Exact Boundary, Left Boundary, Right Boundary, Partial Overlap) are generated and saved in the `../charts/` directory relative to this README.
