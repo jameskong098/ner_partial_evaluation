@@ -76,3 +76,11 @@ if __name__ == "__main__":
     print(result.detailed_results)
 
     # repeat this process on the test set
+    test_predictions = predict(data_points=corpus.test, model=model, batch_size=32)
+    corpus = load_corpus()
+    test_scores = scorer_evaluate(corpus.test, test_predictions)
+    test_scores.print_score_report()
+
+    # check by evaluating with Flair
+    test_result = model.evaluate(data_points=corpus.test, gold_label_type=label_type, gold_label_dictionary=label_dict)
+    print(test_result.detailed_results)

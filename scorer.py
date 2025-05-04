@@ -25,8 +25,6 @@ class Scorer:
         reference_set = set(reference)
         predictions_set = set(predictions)
 
-        # TODO consider a different way to store the counts: dictionary?
-
         # strict evaluation
         self.true_positives = len(reference_set & predictions_set)
         self.false_positives = len(predictions_set - reference_set)
@@ -36,13 +34,12 @@ class Scorer:
         self.reference = list(reference)
         self.predictions = list(predictions)
 
+        # strict boundary, no type
+        self.exact_boundary_tp, self.exact_boundary_fp, self.exact_boundary_fn = self.__count_boundary_matches()
+
         self.possible = len(self.reference) # used for recall
         self.actual = len(self.predictions) # used for precision
 
-        # self.left_match_tp = 0
-        # self.right_match_tp = 0
-        # self.partial_match_tp = 0
-        # self.type_match_tp = 0
         self.overlap_scores = 0.0
         
         # Calculate Left Boundary Matches (Boundary + Type)
@@ -144,9 +141,21 @@ class Scorer:
             if pred_type in ref_types:
                 self.type_match_tp += 1
     
-    def __count_partial_matches(self) -> tuple[float, int, int, list]: 
-        """Calculates overlap-based partial matches. Credit is 1 for exact, 0.5 for overlap."""
-        partial_match_tp = 0.0 
+    def __count_boundary_matches(self) -> tuple[int, int, int]:
+        # only consider boundaries
+        # same boundary implies same text so we ignore text
+        references_no_type = set([(mention.start, mention.end) for mention in self.reference])
+        predictions_no_type = set([(mention.start, mention.end) for mention in self.predictions])
+
+        # set operations to compute counts
+        true_positives = len(references_no_type & predictions_no_type)
+        false_positives = len(predictions_no_type - references_no_type)
+        false_negatives = len(references_no_type - predictions_no_type)
+
+        return true_positives, false_positives, false_negatives
+
+    def __count_partial_matches(self) -> tuple[int, int, int]:
+        partial_match_tp = 0
         partial_match_fp = 0
         partial_match_fn = 0
         partial_credit_list = []
@@ -247,6 +256,30 @@ class Scorer:
         if self.precision() + self.recall() == 0:
             return 0.0
         return (2 * self.precision() * self.recall()) / (self.precision() + self.recall())
+    
+    def exact_boundary_precision(self) -> float:
+        """
+        Finds exact mention-level precision using pre-computed counts.
+        """
+        if self.exact_boundary_tp + self.exact_boundary_fp == 0:
+            return 0.0
+        return self.exact_boundary_tp / (self.exact_boundary_tp + self.exact_boundary_fp)
+
+    def exact_boundary_recall(self) -> float:
+        """
+        Finds exact mention-level recall using pre-computed counts.
+        """
+        if self.exact_boundary_tp + self.exact_boundary_fn == 0:
+            return 0.0
+        return self.exact_boundary_tp / (self.exact_boundary_tp + self.exact_boundary_fn)
+
+    def exact_boundary_f1_score(self) -> float:
+        """
+        Finds exact mention-level F1 using pre-computed counts.
+        """
+        if self.exact_boundary_precision() + self.exact_boundary_recall() == 0:
+            return 0.0
+        return (2 * self.exact_boundary_precision() * self.exact_boundary_recall()) / (self.exact_boundary_precision() + self.exact_boundary_recall())
     
     def left_match_precision(self) -> float:
         """
@@ -369,14 +402,15 @@ class Scorer:
         self.true_positives += other_scorer.true_positives
         self.false_positives += other_scorer.false_positives
         self.false_negatives += other_scorer.false_negatives
-        # self.left_match_tp += other_scorer.left_match_tp
-        # self.right_match_tp += other_scorer.right_match_tp
-        # self.partial_match_tp += other_scorer.partial_match_tp
-        # self.type_match_tp += other_scorer.type_match_tp
+
         self.overlap_scores += other_scorer.overlap_scores
         self.left_match_tp += other_scorer.left_match_tp
         self.left_match_fp += other_scorer.left_match_fp
         self.left_match_fn += other_scorer.left_match_fn
+
+        self.exact_boundary_tp += other_scorer.exact_boundary_tp
+        self.exact_boundary_fp += other_scorer.exact_boundary_fp
+        self.exact_boundary_fn += other_scorer.exact_boundary_fn
 
         self.right_match_tp += other_scorer.right_match_tp
         self.right_match_fp += other_scorer.right_match_fp
@@ -400,9 +434,10 @@ class Scorer:
 
     def print_score_report(self):
         print(f"Exact F1: {self.f1_score() * 100:0.2f}")
-        print(f"Left match F1: {self.left_match_f1() * 100:0.2f}")
-        print(f"Right match F1: {self.right_match_f1() * 100:0.2f}")
-        print(f"Partial match F1: {self.partial_match_f1() * 100:0.2f}")
+        print(f"Exact boundary F1: {self.exact_boundary_f1_score() * 100:0.2f}")
+        print(f"Left boundary match F1: {self.left_match_f1() * 100:0.2f}")
+        print(f"Right boundary match F1: {self.right_match_f1() * 100:0.2f}")
+        print(f"Partial boundary match F1: {self.partial_match_f1() * 100:0.2f}")
         print(f"\tPercent given partial credit: {self.partial_credit_ratio() * 100:0.2f}")
 
     def write_partial_matches(self, path: str, match_type: str = "overlap") -> None:
