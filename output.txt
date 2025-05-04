@@ -1,0 +1,71 @@
+2025-05-04 15:52:07,722 Reading data from broad_twitter_corpus
+2025-05-04 15:52:07,722 Train: broad_twitter_corpus/train.txt
+2025-05-04 15:52:07,722 Dev: broad_twitter_corpus/dev.txt
+2025-05-04 15:52:07,722 Test: broad_twitter_corpus/test.txt
+2025-05-04 15:52:08,639 Computing label dictionary. Progress:
+2025-05-04 15:52:08,731 Dictionary created for label 'ner' with 4 values: PER (seen 3101 times), ORG (seen 2267 times), LOC (seen 1996 times)
+2025-05-04 15:52:11,086 SequenceTagger predicts: Dictionary with 9 tags: O, B-PER, I-PER, B-ORG, I-ORG, B-LOC, I-LOC, <START>, <STOP>
+Predicting...
+2025-05-04 15:55:50,831 Reading data from broad_twitter_corpus
+2025-05-04 15:55:50,832 Train: broad_twitter_corpus/train.txt
+2025-05-04 15:55:50,832 Dev: broad_twitter_corpus/dev.txt
+2025-05-04 15:55:50,832 Test: broad_twitter_corpus/test.txt
+Evaluating...
+Exact F1: 74.59
+Left boundary match F1: 75.32
+Right boundary match F1: 75.22
+Partial boundary match F1: 75.85
+	Percent given partial credit: 3.28
+Generating visualizations in dev_charts...
+Saved seaborn comparison chart to dev_charts/metrics_comparison_chart_seaborn.png
+Generating partial match credit distribution chart...
+Saved partial match credit distribution chart to dev_charts/partial_match_credit_distribution.png
+
+Results:
+- F-score (micro) 0.7459
+- F-score (macro) 0.6428
+- Accuracy 0.6475
+
+By class:
+              precision    recall  f1-score   support
+
+         PER     0.8588    0.8454    0.8520       705
+         ORG     0.6713    0.3556    0.4649       270
+         LOC     0.8132    0.4901    0.6116       151
+
+   micro avg     0.8254    0.6803    0.7459      1126
+   macro avg     0.7811    0.5637    0.6428      1126
+weighted avg     0.8077    0.6803    0.7270      1126
+
+Predicting...
+2025-05-04 16:06:02,306 Reading data from broad_twitter_corpus
+2025-05-04 16:06:02,307 Train: broad_twitter_corpus/train.txt
+2025-05-04 16:06:02,307 Dev: broad_twitter_corpus/dev.txt
+2025-05-04 16:06:02,307 Test: broad_twitter_corpus/test.txt
+Evaluating...
+Exact F1: 74.56
+Left boundary match F1: 75.38
+Right boundary match F1: 75.84
+Partial boundary match F1: 76.45
+	Percent given partial credit: 4.83
+
+Results:
+- F-score (micro) 0.7456
+- F-score (macro) 0.6859
+- Accuracy 0.6428
+
+By class:
+              precision    recall  f1-score   support
+
+         PER     0.8595    0.8708    0.8651      1602
+         ORG     0.6131    0.4861    0.5423       792
+         LOC     0.8024    0.5465    0.6502       602
+
+   micro avg     0.7926    0.7039    0.7456      2996
+   macro avg     0.7583    0.6345    0.6859      2996
+weighted avg     0.7829    0.7039    0.7366      2996
+
+Generating visualizations in test_charts...
+Saved seaborn comparison chart to test_charts/metrics_comparison_chart_seaborn.png
+Generating partial match credit distribution chart...
+Saved partial match credit distribution chart to test_charts/partial_match_credit_distribution.png

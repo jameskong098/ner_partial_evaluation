@@ -16,6 +16,8 @@ import pandas as pd
 import numpy as np
 import seaborn as sns 
 
+import pickle
+
 def predict(data_points, model, batch_size, force_token_labels=False):
 
     # this is based on Flair's prediction method for their sequence tagger
@@ -55,24 +57,21 @@ def generate_visualizations(scores, output_dir="charts"):
 
     # --- Visualization 1: Metrics Comparison --
     metrics_data = {
-        'Metric': ['Exact Match', 'Exact Boundary', 'Left Boundary', 'Right Boundary', 'Partial (Overlap)'],
+        'Metric': ['Exact Match', 'Left Boundary', 'Right Boundary', 'Partial (Overlap)'],
         'Precision': [
             scores.precision(),
-            scores.exact_boundary_precision(),
             scores.left_match_precision(),
             scores.right_match_precision(),
             scores.partial_match_precision()
         ],
         'Recall': [
             scores.recall(),
-            scores.exact_boundary_recall(),
             scores.left_match_recall(),
             scores.right_match_recall(),
             scores.partial_match_recall()
         ],
         'F1 Score': [
             scores.f1_score(),
-            scores.exact_boundary_f1_score(),
             scores.left_match_f1(),
             scores.right_match_f1(),
             scores.partial_match_f1()
@@ -147,6 +146,7 @@ def generate_visualizations(scores, output_dir="charts"):
     plt.close() 
     print(f"Saved partial match credit distribution chart to {credit_chart_path}")
 
+
 if __name__ == "__main__":
     # load corpus
     corpus = load_corpus()
@@ -157,7 +157,7 @@ if __name__ == "__main__":
     label_dict = corpus.make_label_dictionary(label_type=label_type, add_unk=True)
 
     # load model from file
-    model_path = os.path.expanduser('~/.flair/models/best-model.pt')  # Ensure correct path
+    model_path = "model/best-model.pt"  # Ensure correct path
     if not os.path.isfile(model_path):
         raise FileNotFoundError(f"Model file not found at {model_path}")
     model = SequenceTagger.load(model_path)
@@ -170,11 +170,6 @@ if __name__ == "__main__":
     corpus = load_corpus()
     scores = scorer_evaluate(corpus.dev, predictions)
     scores.print_score_report()
-<<<<<<< HEAD
-    scores.write_partial_matches("predictions/partial_dev.csv")
-    # TODO add writing of left matches
-    # TODO add writing of right matches
-=======
 
     # Write partial match CSVs
     os.makedirs("predictions", exist_ok=True) 
@@ -182,8 +177,11 @@ if __name__ == "__main__":
     scores.write_partial_matches("predictions/partial_dev_left_bound.csv", match_type="left")
     scores.write_partial_matches("predictions/partial_dev_right_bound.csv", match_type="right")
 
-    generate_visualizations(scores)
->>>>>>> 4b1acfddbb7642983301fe97e771ddeb7ab43c62
+    generate_visualizations(scores, output_dir="dev_charts")
+
+    # dump scores to file
+    with open("dev_scores", mode="wb") as file:
+        pickle.dump(scores.get_score_dict(), file)
 
     # evaluate with Flair
     # do this AFTER our evaluation, since Corpus is modified
@@ -199,3 +197,14 @@ if __name__ == "__main__":
     # check by evaluating with Flair
     test_result = model.evaluate(data_points=corpus.test, gold_label_type=label_type, gold_label_dictionary=label_dict)
     print(test_result.detailed_results)
+
+    # write partial matches
+    test_scores.write_partial_matches("predictions/partial_test_overlap.csv", match_type="overlap")
+    test_scores.write_partial_matches("predictions/partial_test_left_bound.csv", match_type="left")
+    test_scores.write_partial_matches("predictions/partial_test_right_bound.csv", match_type="right")
+
+    generate_visualizations(test_scores, output_dir="test_charts")
+    
+    # dump scores to file
+    with open("test_scores", mode="wb") as file:
+        pickle.dump(test_scores.get_score_dict(), file)
