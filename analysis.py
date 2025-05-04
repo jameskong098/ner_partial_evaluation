@@ -51,7 +51,10 @@ if __name__ == "__main__":
     label_dict = corpus.make_label_dictionary(label_type=label_type, add_unk=True)
 
     # load model from file
-    model = SequenceTagger.load(os.path.join('model', 'best-model.pt'))
+    model_path = os.path.expanduser('~/.flair/models/best-model.pt')  # Ensure correct path
+    if not os.path.isfile(model_path):
+        raise FileNotFoundError(f"Model file not found at {model_path}")
+    model = SequenceTagger.load(model_path)
 
     # evaluate with our Scorer
     predictions = predict(data_points=corpus.dev, model=model, batch_size=32)   
@@ -61,7 +64,11 @@ if __name__ == "__main__":
     corpus = load_corpus()
     scores = scorer_evaluate(corpus.dev, predictions)
     scores.print_score_report()
-    scores.write_partial_matches("predictions/partial_dev.csv")
+
+    # Write partial match CSVs
+    scores.write_partial_matches("predictions/partial_dev_overlap.csv", match_type="overlap")
+    scores.write_partial_matches("predictions/partial_dev_left_bound.csv", match_type="left")
+    scores.write_partial_matches("predictions/partial_dev_right_bound.csv", match_type="right")
 
     # evaluate with Flair
     # do this AFTER our evaluation, since Corpus is modified
