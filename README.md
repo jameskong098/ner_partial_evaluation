@@ -4,6 +4,7 @@
 
 ## Implemented Evaluation Metrics
 
+<<<<<<< HEAD
 The following metrics are implemented in `scorer.py`:
 
 -   **Exact Match:** Requires exact match of entity type and character span boundaries.
@@ -15,6 +16,14 @@ The following metrics are implemented in `scorer.py`:
     -   A prediction can match at most one gold mention (either exactly or partially).
 
 See [`guidelines.md`](guidelines.md) for a discussion on the rationale and quality assessment of partial matches.
+=======
+- Exact: exact type and boundary match
+- Left boundary and type match
+- Right boundary match and type match
+- Partial boundary match: any overlap in predicted and reference spans, type matches
+    - A gold mention can have no more than 1 matching partial prediction
+    - A prediction cannot partially match more than 1 gold mention  
+>>>>>>> 1e54fdd3a34cdbff5f6b4c60a12e7caf10cd8f30
 
 ## Motivation
 

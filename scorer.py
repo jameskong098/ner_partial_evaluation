@@ -65,7 +65,11 @@ class Scorer:
                 # Check for left boundary and type match
                 if ref.start == pred.start and ref.entity_type == pred.entity_type:
                     # Assign credit: 1.0 if ends also match (exact), 0.5 otherwise
-                    credit = 1.0 if ref.end == pred.end else 0.5
+                    if ref.end == pred.end:
+                        credit = 1.0
+                    else:
+                        credit = 0.5
+                        self.left_match_tp -= 0.5 # partial matches worth half credit towards score
                     self.left_credit_list.append((ref, pred, credit))
 
         self.right_credit_list = []
@@ -74,7 +78,11 @@ class Scorer:
                 # Check for right boundary and type match
                 if ref.end == pred.end and ref.entity_type == pred.entity_type:
                     # Assign credit: 1.0 if starts also match (exact), 0.5 otherwise
-                    credit = 1.0 if ref.start == pred.start else 0.5
+                    if ref.start == pred.start:
+                        credit = 1.0
+                    else:
+                        credit = 0.5
+                        self.right_match_tp -= 0.5 # partial matches worth half credit towards score
                     self.right_credit_list.append((ref, pred, credit))
 
 
@@ -287,7 +295,7 @@ class Scorer:
         """
         if self.left_match_tp + self.left_match_fp == 0:
             return 0.0
-        return self.left_match_tp / (self.left_match_tp + self.left_match_fp)
+        return self.left_match_tp / self.actual
     
     def left_match_recall(self) -> float:
         """
@@ -295,7 +303,7 @@ class Scorer:
         """
         if self.left_match_tp + self.left_match_fn == 0:
             return 0.0
-        return self.left_match_tp / (self.left_match_tp + self.left_match_fn)
+        return self.left_match_tp / self.possible
     
     def left_match_f1(self) -> float:
         """
@@ -313,7 +321,7 @@ class Scorer:
         """
         if self.right_match_tp + self.right_match_fp == 0:
             return 0.0
-        return self.right_match_tp / (self.right_match_tp + self.right_match_fp)
+        return self.right_match_tp / self.actual
     
     def right_match_recall(self) -> float:
         """
@@ -321,7 +329,7 @@ class Scorer:
         """
         if self.right_match_tp + self.right_match_fn == 0:
             return 0.0
-        return self.right_match_tp / (self.right_match_tp + self.right_match_fn)
+        return self.right_match_tp / self.possible
     
     def right_match_f1(self) -> float:
         """
@@ -434,7 +442,7 @@ class Scorer:
 
     def print_score_report(self):
         print(f"Exact F1: {self.f1_score() * 100:0.2f}")
-        print(f"Exact boundary F1: {self.exact_boundary_f1_score() * 100:0.2f}")
+        # print(f"Exact boundary F1: {self.exact_boundary_f1_score() * 100:0.2f}")
         print(f"Left boundary match F1: {self.left_match_f1() * 100:0.2f}")
         print(f"Right boundary match F1: {self.right_match_f1() * 100:0.2f}")
         print(f"Partial boundary match F1: {self.partial_match_f1() * 100:0.2f}")
@@ -462,6 +470,29 @@ class Scorer:
                 gold_text = f'"{gold.text}"' if ',' in gold.text else gold.text
                 pred_text = f'"{pred.text}"' if ',' in pred.text else pred.text
                 file.write(f"{gold_text},{pred_text},{cred}\n")
+
+    def get_score_dict(self):
+        return {
+            'Metric': ['Exact Match', 'Left Boundary', 'Right Boundary', 'Partial (Overlap)'],
+            'Precision': [
+                self.precision(),
+                self.left_match_precision(),
+                self.right_match_precision(),
+                self.partial_match_precision()
+            ],
+            'Recall': [
+                self.recall(),
+                self.left_match_recall(),
+                self.right_match_recall(),
+                self.partial_match_recall()
+            ],
+            'F1 Score': [
+                self.f1_score(),
+                self.left_match_f1(),
+                self.right_match_f1(),
+                self.partial_match_f1()
+            ]
+        }
 
     @staticmethod
     def create_mentions(labels: Sequence[Label]) -> list[Mention]:
