@@ -49,9 +49,9 @@ def scorer_evaluate(reference, predictions):
             )
     return scores
 
-def generate_visualizations(scores, output_dir="charts"):
+def generate_visualizations(scores, output_dir="charts", dataset_name=""):
     """Generates and saves bar charts of the evaluation metrics."""
-    print(f"Generating visualizations in {output_dir}...")
+    print(f"Generating visualizations for '{dataset_name}' in {output_dir}...")
     os.makedirs(output_dir, exist_ok=True)
     sns.set_theme(style="whitegrid") 
 
@@ -87,7 +87,7 @@ def generate_visualizations(scores, output_dir="charts"):
 
     ax_bar.set_xlabel('Evaluation Metric Type', fontsize=12)
     ax_bar.set_ylabel('Score (%)', fontsize=12)
-    ax_bar.set_title('Comparison of NER Evaluation Metrics', fontsize=14)
+    ax_bar.set_title(f'Comparison of NER Evaluation Metrics ({dataset_name.capitalize()})', fontsize=14) 
     ax_bar.set_xticklabels(ax_bar.get_xticklabels(), rotation=45, ha="right", fontsize=10)
     ax_bar.legend(title='Score Type')
     ax_bar.grid(axis='y', linestyle='--')
@@ -97,13 +97,14 @@ def generate_visualizations(scores, output_dir="charts"):
         ax_bar.bar_label(container, fmt='%.1f', padding=3, fontsize=8)
 
     plt.tight_layout()
-    chart_path = os.path.join(output_dir, "metrics_comparison_chart_seaborn.png") 
+    filename_prefix = f"{dataset_name}_" if dataset_name else ""
+    chart_path = os.path.join(output_dir, f"{filename_prefix}metrics_comparison_chart_seaborn.png")
     plt.savefig(chart_path)
     plt.close() # Close the figure to free memory
     print(f"Saved seaborn comparison chart to {chart_path}")
 
     # --- Visualization 2: Partial Match Credit Distribution ---
-    print("Generating partial match credit distribution chart...")
+    print(f"Generating partial match credit distribution chart for '{dataset_name}'...")
     credit_data = []
 
     # Process Overlap Credits
@@ -132,7 +133,7 @@ def generate_visualizations(scores, output_dir="charts"):
 
     ax_credits.set_xlabel('Partial Match Strategy', fontsize=12)
     ax_credits.set_ylabel('Number of Matches', fontsize=12)
-    ax_credits.set_title('Distribution of Exact (1.0) vs. Partial (0.5) Credits', fontsize=14)
+    ax_credits.set_title(f'Distribution of Exact (1.0) vs. Partial (0.5) Credits ({dataset_name.capitalize()})', fontsize=14) 
     ax_credits.legend(title='Credit Type')
     ax_credits.grid(axis='y', linestyle='--')
 
@@ -141,7 +142,7 @@ def generate_visualizations(scores, output_dir="charts"):
         ax_credits.bar_label(container, fmt='%d', padding=3, fontsize=9)
 
     plt.tight_layout()
-    credit_chart_path = os.path.join(output_dir, "partial_match_credit_distribution.png")
+    credit_chart_path = os.path.join(output_dir, f"{filename_prefix}partial_match_credit_distribution.png")
     plt.savefig(credit_chart_path)
     plt.close() 
     print(f"Saved partial match credit distribution chart to {credit_chart_path}")
@@ -157,7 +158,7 @@ if __name__ == "__main__":
     label_dict = corpus.make_label_dictionary(label_type=label_type, add_unk=True)
 
     # load model from file
-    model_path = "model/best-model.pt"  # Ensure correct path
+    model_path = "models/best-model.pt"  
     if not os.path.isfile(model_path):
         raise FileNotFoundError(f"Model file not found at {model_path}")
     model = SequenceTagger.load(model_path)
@@ -177,7 +178,7 @@ if __name__ == "__main__":
     scores.write_partial_matches("predictions/partial_dev_left_bound.csv", match_type="left")
     scores.write_partial_matches("predictions/partial_dev_right_bound.csv", match_type="right")
 
-    generate_visualizations(scores, output_dir="dev_charts")
+    generate_visualizations(scores, output_dir="dev_charts", dataset_name="dev") 
 
     # dump scores to file
     with open("dev_scores", mode="wb") as file:
@@ -203,7 +204,7 @@ if __name__ == "__main__":
     test_scores.write_partial_matches("predictions/partial_test_left_bound.csv", match_type="left")
     test_scores.write_partial_matches("predictions/partial_test_right_bound.csv", match_type="right")
 
-    generate_visualizations(test_scores, output_dir="test_charts")
+    generate_visualizations(test_scores, output_dir="test_charts", dataset_name="test")
     
     # dump scores to file
     with open("test_scores", mode="wb") as file:
