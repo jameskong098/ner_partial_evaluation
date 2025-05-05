@@ -148,6 +148,71 @@ def generate_visualizations(scores, output_dir="charts", dataset_name=""):
     print(f"Saved partial match credit distribution chart to {credit_chart_path}")
 
 
+def generate_comparison_visualization(dev_scores, test_scores, output_dir="comparison_charts"):
+    """Generates and saves a bar chart comparing dev and test set metrics."""
+    print(f"Generating comparison visualization in {output_dir}...")
+    os.makedirs(output_dir, exist_ok=True)
+    sns.set_theme(style="whitegrid")
+
+    datasets = {'dev': dev_scores, 'test': test_scores}
+    comparison_data = []
+
+    for dataset_name, scores in datasets.items():
+        metrics_data = {
+            'Metric': ['Exact Match', 'Left Boundary', 'Right Boundary', 'Partial (Overlap)'],
+            'Precision': [
+                scores.precision(),
+                scores.left_match_precision(),
+                scores.right_match_precision(),
+                scores.partial_match_precision()
+            ],
+            'Recall': [
+                scores.recall(),
+                scores.left_match_recall(),
+                scores.right_match_recall(),
+                scores.partial_match_recall()
+            ],
+            'F1 Score': [
+                scores.f1_score(),
+                scores.left_match_f1(),
+                scores.right_match_f1(),
+                scores.partial_match_f1()
+            ]
+        }
+        df = pd.DataFrame(metrics_data)
+        df_melted = df.melt(id_vars='Metric', var_name='Score Type', value_name='Score Value')
+        df_melted['Dataset'] = dataset_name
+        comparison_data.append(df_melted)
+
+    df_comparison = pd.concat(comparison_data)
+    df_comparison['Score Value'] = df_comparison['Score Value'].round(4) * 100
+
+    g = sns.catplot(
+        data=df_comparison, kind="bar",
+        x="Metric", y="Score Value", hue="Dataset", col="Score Type",
+        palette="viridis", height=6, aspect=.7 
+    )
+
+    g.set_axis_labels("Evaluation Metric Type", "Score (%)")
+    g.set_titles("{col_name}")
+    g.set_xticklabels(rotation=45, ha="right", fontsize=10)
+    g.fig.suptitle('Comparison of Dev vs. Test NER Evaluation Metrics', y=1.03, fontsize=16) 
+    g.despine(left=True) 
+    g.set(ylim=(0, 105))
+
+    for ax in g.axes.flat:
+        for container in ax.containers:
+            ax.bar_label(container, fmt='%.1f', padding=3, fontsize=8)
+
+    sns.move_legend(g, "upper left", bbox_to_anchor=(1.01, 1), title='Dataset')
+
+    plt.tight_layout(rect=[0, 0, 0.95, 0.97]) 
+    chart_path = os.path.join(output_dir, "dev_vs_test_metrics_comparison.png")
+    plt.savefig(chart_path, bbox_inches='tight') 
+    plt.close('all') 
+    print(f"Saved comparison chart to {chart_path}")
+
+
 if __name__ == "__main__":
     # load corpus
     corpus = load_corpus()
@@ -181,8 +246,9 @@ if __name__ == "__main__":
     generate_visualizations(scores, output_dir="dev_charts", dataset_name="dev") 
 
     # dump scores to file
-    with open("dev_scores", mode="wb") as file:
-        pickle.dump(scores.get_score_dict(), file)
+    dev_scores_dict = scores.get_score_dict() # Store dev scores dict
+    with open("dev_scores.pkl", mode="wb") as file: # Use .pkl extension
+        pickle.dump(dev_scores_dict, file)
 
     # evaluate with Flair
     # do this AFTER our evaluation, since Corpus is modified
@@ -207,5 +273,9 @@ if __name__ == "__main__":
     generate_visualizations(test_scores, output_dir="test_charts", dataset_name="test")
     
     # dump scores to file
-    with open("test_scores", mode="wb") as file:
-        pickle.dump(test_scores.get_score_dict(), file)
+    test_scores_dict = test_scores.get_score_dict() # Store test scores dict
+    with open("test_scores.pkl", mode="wb") as file: # Use .pkl extension
+        pickle.dump(test_scores_dict, file)
+
+    # Generate the comparison chart using the collected scores objects
+    generate_comparison_visualization(scores, test_scores, output_dir="comparison_charts")
