@@ -1,0 +1,17 @@
+# Core dependencies for the NER partial evaluation project
+flair>=0.15.1
+pandas>=2.2.3
+numpy>=2.0.2
+seaborn>=0.13.2
+matplotlib>=3.9.4
+tqdm>=4.67.1
+torch>=2.7.0 
+
+# Note: The specific versions listed above are based on the provided environment.
+# You might be able to use newer compatible versions.
+
+# Optional: For GPU acceleration with Flair/PyTorch
+# The specific nvidia-* packages depend on your CUDA version and installation.
+# Installing flair and torch correctly for your system (CPU or GPU)
+# usually handles the necessary backend dependencies.
+# Refer to PyTorch (pytorch.org) and Flair documentation for GPU setup.
