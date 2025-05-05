@@ -4,71 +4,113 @@
 
 ## Implemented Evaluation Metrics
 
-- Exact: exact type and boundary match
-- Left boundary match: ignores type
-- Right boundary match: ignores type
-- Partial boundary match: any overlap in predicted and reference spans, ignores type
-    - A gold mention can have no more than 1 matching partial prediction
-    - A prediction cannot partially match more than 1 gold mention  
-- Overlap: weighted by overlap b/w predicted and reference spans, ignores type
-    - Same rules as above must apply
+The following metrics are implemented in `scorer.py`:
+
+-   **Exact Match:** Requires exact match of entity type and character span boundaries.
+-   **Exact Boundary Match:** Requires exact match of character span boundaries, ignoring entity type.
+-   **Left Boundary Match:** Requires match of the starting character boundary and entity type, ignoring the end boundary. Awards partial credit (0.5) if only the left boundary matches, full credit (1.0) if it's an exact match.
+-   **Right Boundary Match:** Requires match of the ending character boundary and entity type, ignoring the start boundary. Awards partial credit (0.5) if only the right boundary matches, full credit (1.0) if it's an exact match.
+-   **Partial (Overlap) Match:** Requires any overlap between the predicted and reference character spans *and* a matching entity type. Awards partial credit (0.5) for overlap, full credit (1.0) for an exact match.
+    -   A gold mention can match at most one prediction (either exactly or partially).
+    -   A prediction can match at most one gold mention (either exactly or partially).
+
+See [`guidelines.md`](guidelines.md) for a discussion on the rationale and quality assessment of partial matches.
 
 ## Motivation
 
 Named Entity Recognition (NER) evaluation currently sits between two extremes:
-- **Token-level F1**: Too lenient - identifying just one token (e.g., "New" in "New York") doesn't capture the complete entity.
-- **Exact phrase-level F1**: Too strict - requires perfect boundary and type matching, creating both false positives and negatives for minor boundary differences.
+-   **Token-level F1**: Too lenient - identifying just one token (e.g., "New" in "New York") doesn't capture the complete entity.
+-   **Exact phrase-level F1**: Too strict - requires perfect boundary and type matching, creating both false positives and negatives for minor boundary differences.
 
 Consider these examples:
-- Gold: "The Ohio State University"[ORG] is in "Ohio"[LOC].
-- Prediction: The "Ohio State University"[ORG] is in "Ohio"[LOC].
+-   Gold: "The Ohio State University"[ORG] is in "Ohio"[LOC].
+-   Prediction: The "Ohio State University"[ORG] is in "Ohio"[LOC].
 
 Or:
-- Gold: "The New York Times"[ORG]
-- Prediction: The "New York Times"[ORG]
+-   Gold: "The New York Times"[ORG]
+-   Prediction: The "New York Times"[ORG]
 
-These predictions capture the correct entities but are penalized as errors under exact matching. We believe partial credit would better reflect model performance.
+These predictions capture the correct entities but are penalized as errors under exact matching. We believe partial credit would better reflect model performance in many cases.
 
 ## Project Overview
 
-This project explores evaluation metrics that award partial credit to NER predictions that are close but not exact matches to annotated data. We will:
+This project explores evaluation metrics that award partial credit to NER predictions that are close but not exact matches to annotated data. 
 
-1. Implement various partial evaluation metrics (based on SemEval 2013 and other approaches)
-2. Train NER models using FLAIR with CRF on Twitter data
-3. Evaluate model outputs using different metrics
-4. Conduct human error analysis to determine how well metrics align with human judgment
-5. Compare partial metrics against baseline token-level and exact-match F1
+1.  Implement various exact and partial evaluation metrics (inspired by SemEval 2013 and other approaches) in `scorer.py`.
+2.  Train an NER model using FLAIR with CRF on the Broad Twitter Corpus (`train.py`, `train.ipynb`).
+3.  Evaluate model outputs using the different metrics implemented in `scorer.py` via `analysis.py`.
+4.  Generate detailed reports of partial matches (`predictions/`) and visualizations (`charts/`).
+5.  Analyze the quality of partial matches based on defined guidelines ([`guidelines.md`](guidelines.md), [`predictions/README.md`](predictions/README.md)).
+6.  Compare partial metrics against baseline exact-match F1.
 
 ## Dataset
 
-We will work primarily with Twitter data, where exact matching is particularly challenging:
-- [Broad Twitter Corpus](https://aclanthology.org/C16-1111.pdf)
+We use the [Broad Twitter Corpus](https://aclanthology.org/C16-1111.pdf), a dataset known for annotation challenges that make exact matching difficult.
+
+**Preprocessing:** The original dataset contains inconsistencies where mentions starting with "@" followed immediately by the rest of the entity (e.g., "@" [B-PER], "username" [B-PER]) are tagged as separate entities. The script `broad_twitter_corpus/dataset_correction.py` corrects this by merging such cases into single entities (e.g., "@" [B-PER], "username" [I-PER]) before training and evaluation. The corrected files (`train.txt`, `dev.txt`, `test.txt`) are used by the project.
 
 ## Methodology
 
-### Model Implementation
-- Using [FLAIR](https://github.com/flairNLP/flair) with CRF to minimize invalid label sequences
-- Focus on comparing evaluation metrics rather than optimizing model architecture
+### Model Implementation (`train.py`)
+-   Uses the [FLAIR](https://github.com/flairNLP/flair) library.
+-   Employs a `SequenceTagger` model.
+-   Utilizes stacked embeddings (e.g., `WordEmbeddings('twitter')`, `FlairEmbeddings`).
+-   Incorporates a Conditional Random Field (CRF) layer (`use_crf=True`) to improve tag sequence validity.
+-   Training is performed using `ModelTrainer`.
 
-### Partial Evaluation Metrics
-We will implement and analyze several metrics:
-- Left match: Left boundary + category matches (good for relation extraction)
-- Right match: Useful for missing/included preceding adjectives
-- Partial match: Any fragment overlap
-- Approximate match: Substring of annotation
-- Fragment percentage: What percentage of the entity is correctly identified
-- Categorical relaxation: Relaxing ontology constraints
-- Scoring weights: Award different partial credits (e.g., 0.5) for partially correct annotations
+### Evaluation (`analysis.py`, `scorer.py`)
+-   The `analysis.py` script loads the trained model and the test/dev portions of the corpus.
+-   It generates predictions on the dataset.
+-   The `scorer.py` module calculates scores for all implemented metrics (Exact, Exact Boundary, Left, Right, Partial Overlap) by comparing predictions against gold standard annotations.
+-   Detailed CSV files listing the specific gold/prediction pairs that received partial credit (0.5) or full credit (1.0) for overlap, left, and right boundary strategies are saved in the `predictions/` directory. See `predictions/README.md` for an analysis of these matches.
+-   Summary visualizations comparing the performance across different metrics are generated and saved in the `charts/` directory.
 
-### Analysis
-- Quantitative comparison of how different metrics score the same predictions
-- Tune models using each scoring metric and compare the results
-- Human evaluation to determine which metrics best align with human judgment
-- Error analysis to identify patterns in partial matches
+## Results / Visualizations
+
+The following charts summarize the performance of the trained model on the development set using the different evaluation metrics, generated by `analysis.py`.
+
+**Comparison of NER Evaluation Metrics:**
+![Metrics Comparison Chart](charts/metrics_comparison_chart_seaborn.png)
+
+**Distribution of Exact vs. Partial Credits for Partial Matching Strategies:**
+![Partial Match Credit Distribution Chart](charts/partial_match_credit_distribution.png)
+
+*(Note: Charts reflect results from a specific run and may change if the model or data is updated.)*
+
+## Dependencies
+
+The project requires Python 3.x and the libraries listed in `requirements.txt`. Key dependencies include:
+
+-   `flair` (and its core dependency `torch`)
+-   `pandas`
+-   `numpy`
+-   `seaborn`
+-   `matplotlib`
+-   `tqdm`
+
+You can install the required dependencies using pip:
+```bash
+pip install -r requirements.txt
+```
+
+**GPU Acceleration (Optional):**
+`nvidia-*` packages are related to using a CUDA-enabled GPU for faster model training and inference with PyTorch/Flair. They are not strictly required to run the code on a CPU. If you intend to use a GPU, ensure you have the correct NVIDIA drivers and CUDA toolkit installed, and follow the installation instructions for PyTorch ([https://pytorch.org/](https://pytorch.org/)) and Flair for your specific setup. Installing the GPU-compatible version of `torch` usually handles the necessary `nvidia-*` dependencies.
+
+## How to Run
+
+1.  **Prepare Data:** Ensure the corrected Broad Twitter Corpus files (`train.txt`, `dev.txt`, `test.txt`) are present in the `broad_twitter_corpus/` directory. You can generate these using `python broad_twitter_corpus/dataset_correction.py`.
+2.  **Install Dependencies:** Set up a virtual environment and install the required packages:
+    ```bash
+    python -m venv venv
+    source venv/bin/activate  
+    pip install -r requirements.txt
+    ```
+3.  **Train Model:** Run the training script: `python train.py`. This will save the best model (e.g., `resources/taggers/sota-ner-flair/best-model.pt`). *Alternatively, use the `train.ipynb` notebook.*
+4.  **Run Analysis:** Execute the analysis script, ensuring the model path in `analysis.py` points to your trained model: `python analysis.py`. This will print scores to the console, generate CSV files in `predictions/`, and save charts in `charts/`.
 
 ## References
 
-- [SemEval 2013 Task 9.1](https://aclanthology.org/S13-2056.pdf)
-- [Named Entity Recognition Evaluation](https://www.davidsbatista.net/blog/2018/05/09/Named_Entity_Evaluation/)
-- [Biomedical NER](https://link.springer.com/article/10.1186/1471-2105-7-92)
-- [FLAIR Documentation](https://flairnlp.github.io/docs/tutorial-training/how-to-train-sequence-tagger#training-a-named-entity-recognition-ner-model-with-flair-embeddings)
+-   [SemEval 2013 Task 9.1](https://aclanthology.org/S13-2056.pdf)
+-   [Named Entity Recognition Evaluation](https://www.davidsbatista.net/blog/2018/05/09/Named_Entity_Evaluation/)
+-   [Biomedical NER](https://link.springer.com/article/10.1186/1471-2105-7-92)
+-   [FLAIR Documentation](https://flairnlp.github.io/docs/tutorial-training/how-to-train-sequence-tagger#training-a-named-entity-recognition-ner-model-with-flair-embeddings)
