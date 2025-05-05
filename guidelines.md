@@ -14,8 +14,9 @@ It may not make sense to award full credit for partial matches, because it incen
     - Overlap percentage
 
 # Guidelines: What Makes a Good Partial Match?
-* A partial match clearly refers to the same entity and does not miss significant context. For example, "Ben" vs. "Big Ben" is a bad match because "Ben" could refer to a person rather than the building.
-* Partial match does not include extra meaningful context, which changes meaning or contains unncessessary information
+* A partial match clearly refers to the same entity
+* A partial match can refer to a more general entity which contains the annotated entity, as long as that connection is obvious. (Ex. Philips AVENT is annotated as an ORG, and is contained by the prediction Philips ORG)
+* Partial match does not include extra context which significantly changes its meaning
 
 ## Examples
 | Quality | Gold             | Prediction         |
