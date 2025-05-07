@@ -1,10 +1,8 @@
 # Partial Credit Analysis for NER Predictions
 
-This document analyzes the effectiveness of different partial credit strategies for Named Entity Recognition (NER) predictions using sample data where partial credit (0.5) was awarded.
-
 ## 1. Overlap Analysis (`partial_dev_overlap.csv`)
 
-Partial credit is awarded if the predicted entity string and the gold entity string have any overlapping characters (case-insensitive).
+Partial credit is awarded if the predicted entity span and the gold entity span have any overlapping tokens.
 
 ### Sample Data (Overlap) - 0.5 Credit Examples
 

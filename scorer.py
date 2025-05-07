@@ -2,10 +2,6 @@ from flair.data import Label
 from typing_extensions import NamedTuple
 from typing import Sequence, Dict, Tuple, List, Set, Optional
 
-# for testing purposes
-from flair.data import Sentence
-from flair.nn import Classifier
-
 
 class Mention(NamedTuple):
     """
@@ -34,13 +30,8 @@ class Scorer:
         self.reference = list(reference)
         self.predictions = list(predictions)
 
-        # strict boundary, no type
-        self.exact_boundary_tp, self.exact_boundary_fp, self.exact_boundary_fn = self.__count_boundary_matches()
-
         self.possible = len(self.reference) # used for recall
         self.actual = len(self.predictions) # used for precision
-
-        self.overlap_scores = 0.0
         
         # Calculate Left Boundary Matches (Boundary + Type)
         left_reference_set = set([(mention.start, mention.entity_type) for mention in reference])
@@ -84,83 +75,6 @@ class Scorer:
                         credit = 0.5
                         self.right_match_tp -= 0.5 # partial matches worth half credit towards score
                     self.right_credit_list.append((ref, pred, credit))
-
-
-        self.overlap_credict_dict = {} 
-        
-    def _compute_partial_matches(self) -> None:
-        """
-        Compute all the partial match metrics between reference and predictions.
-        """
-        # Track which references have been matched to avoid double counting
-        matched_refs: Dict[int, Set[str]] = {i: set() for i in range(len(self.reference))}
-        
-        for pred in self.predictions:
-            best_overlap = 0
-            best_ref_idx = -1
-            
-            # Find the best matching reference for this prediction
-            for i, ref in enumerate(self.reference):
-                # Skip if entity types don't match and we're not doing type-relaxed matching
-                # if pred.entity_type != ref.entity_type:
-                #     continue
-                    
-                # Check left boundary match
-                if int(pred.start) == int(ref.start):
-                    if 'left' not in matched_refs[i]:
-                        self.left_match_tp += 1
-                        matched_refs[i].add('left')
-                
-                # Check right boundary match
-                if int(pred.end) == int(ref.end):
-                    if 'right' not in matched_refs[i]:
-                        self.right_match_tp += 1
-                        matched_refs[i].add('right')
-                
-                # Check for any overlap between the spans
-                if max(int(pred.start), int(ref.start)) < min(int(pred.end), int(ref.end)):
-                    if 'partial' not in matched_refs[i]:
-                        self.partial_match_tp += 1
-                        matched_refs[i].add('partial')
-                    
-                    # Calculate overlap percentage
-                    overlap_start = max(int(pred.start), int(ref.start))
-                    overlap_end = min(int(pred.end), int(ref.end))
-                    overlap_length = overlap_end - overlap_start
-                    
-                    union_length = max(int(pred.end), int(ref.end)) - min(int(pred.start), int(ref.start))
-                    overlap_ratio = overlap_length / union_length
-                    
-                    # Track the best overlap for this prediction
-                    if overlap_ratio > best_overlap:
-                        best_overlap = overlap_ratio
-                        best_ref_idx = i
-            
-            # Add the best overlap score if there was a match
-            if best_ref_idx >= 0 and 'overlap' not in matched_refs[best_ref_idx]:
-                self.overlap_scores += best_overlap
-                matched_refs[best_ref_idx].add('overlap')
-        
-        # Count type matches (same entity type, regardless of spans)
-        pred_types = {p.entity_type for p in self.predictions}
-        ref_types = {r.entity_type for r in self.reference}
-        
-        for pred_type in pred_types:
-            if pred_type in ref_types:
-                self.type_match_tp += 1
-    
-    def __count_boundary_matches(self) -> tuple[int, int, int]:
-        # only consider boundaries
-        # same boundary implies same text so we ignore text
-        references_no_type = set([(mention.start, mention.end) for mention in self.reference])
-        predictions_no_type = set([(mention.start, mention.end) for mention in self.predictions])
-
-        # set operations to compute counts
-        true_positives = len(references_no_type & predictions_no_type)
-        false_positives = len(predictions_no_type - references_no_type)
-        false_negatives = len(references_no_type - predictions_no_type)
-
-        return true_positives, false_positives, false_negatives
 
     def __count_partial_matches(self) -> tuple[int, int, int]:
         partial_match_tp = 0
@@ -265,30 +179,6 @@ class Scorer:
             return 0.0
         return (2 * self.precision() * self.recall()) / (self.precision() + self.recall())
     
-    def exact_boundary_precision(self) -> float:
-        """
-        Finds exact mention-level precision using pre-computed counts.
-        """
-        if self.exact_boundary_tp + self.exact_boundary_fp == 0:
-            return 0.0
-        return self.exact_boundary_tp / (self.exact_boundary_tp + self.exact_boundary_fp)
-
-    def exact_boundary_recall(self) -> float:
-        """
-        Finds exact mention-level recall using pre-computed counts.
-        """
-        if self.exact_boundary_tp + self.exact_boundary_fn == 0:
-            return 0.0
-        return self.exact_boundary_tp / (self.exact_boundary_tp + self.exact_boundary_fn)
-
-    def exact_boundary_f1_score(self) -> float:
-        """
-        Finds exact mention-level F1 using pre-computed counts.
-        """
-        if self.exact_boundary_precision() + self.exact_boundary_recall() == 0:
-            return 0.0
-        return (2 * self.exact_boundary_precision() * self.exact_boundary_recall()) / (self.exact_boundary_precision() + self.exact_boundary_recall())
-    
     def left_match_precision(self) -> float:
         """
         Precision for left boundary matches.
@@ -376,32 +266,6 @@ class Scorer:
         if total == 0:
             return 0.0
         return partial_count/total
-    
-    def overlap_precision(self) -> float:
-        """
-        Weighted precision based on overlap percentage.
-        """
-        if len(self.predictions) == 0:
-            return 0.0
-        return self.overlap_scores / len(self.predictions)
-    
-    def overlap_recall(self) -> float:
-        """
-        Weighted recall based on overlap percentage.
-        """
-        if len(self.reference) == 0:
-            return 0.0
-        return self.overlap_scores / len(self.reference)
-    
-    def overlap_f1(self) -> float:
-        """
-        F1 score weighted by overlap percentage.
-        """
-        precision = self.overlap_precision()
-        recall = self.overlap_recall()
-        if precision + recall == 0:
-            return 0.0
-        return (2 * precision * recall) / (precision + recall)
 
     def merge(self, other_scorer: "Scorer") -> None:
         """
@@ -411,18 +275,12 @@ class Scorer:
         self.false_positives += other_scorer.false_positives
         self.false_negatives += other_scorer.false_negatives
 
-        self.overlap_scores += other_scorer.overlap_scores
         self.left_match_tp += other_scorer.left_match_tp
         self.left_match_fp += other_scorer.left_match_fp
         self.left_match_fn += other_scorer.left_match_fn
 
-        self.exact_boundary_tp += other_scorer.exact_boundary_tp
-        self.exact_boundary_fp += other_scorer.exact_boundary_fp
-        self.exact_boundary_fn += other_scorer.exact_boundary_fn
-
         self.right_match_tp += other_scorer.right_match_tp
         self.right_match_fp += other_scorer.right_match_fp
-
         self.right_match_fn += other_scorer.right_match_fn 
 
         self.partial_match_tp += other_scorer.partial_match_tp
@@ -435,14 +293,9 @@ class Scorer:
 
         self.possible += other_scorer.possible
         self.actual += other_scorer.actual
-        
-        # # Append the raw mentions for potential recomputation 
-        # self.reference.extend(other_scorer.reference)
-        # self.predictions.extend(other_scorer.predictions)
 
     def print_score_report(self):
         print(f"Exact F1: {self.f1_score() * 100:0.2f}")
-        # print(f"Exact boundary F1: {self.exact_boundary_f1_score() * 100:0.2f}")
         print(f"Left boundary match F1: {self.left_match_f1() * 100:0.2f}")
         print(f"Right boundary match F1: {self.right_match_f1() * 100:0.2f}")
         print(f"Partial boundary match F1: {self.partial_match_f1() * 100:0.2f}")
@@ -508,22 +361,3 @@ class Scorer:
             text = label.data_point.text
             mentions.append(Mention(entity_type, start, end, text))
         return mentions
-    
-
-if __name__ == "__main__":
-    # simple test case
-    sentence = Sentence('George Washington went to Washington.')
-
-    tagger = Classifier.load('ner-fast')
-
-    tagger.predict(sentence)
-
-    print(sentence)
-
-    gold = [Mention(entity_type='PER', start='0', end='2', text='George Washington'), Mention(entity_type='LOC', start='4', end='5', text='Washington')]
-
-    print(Scorer.create_mentions(sentence.get_labels()))
-
-    test = Scorer(gold, Scorer.create_mentions(sentence.get_labels()))
-
-    print(test.f1_score())

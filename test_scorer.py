@@ -90,11 +90,6 @@ class TestPartialMatch(unittest.TestCase):
         self.assertAlmostEqual(0.6, scores.partial_match_f1())
 
 
-class TestOverlap(unittest.TestCase):
-    # TODO
-    pass
-
-
 class TestMerge(unittest.TestCase):
     def test_merge_exact_match(self) -> None:
         reference = [Mention("PER", 0, 2, "Allen Iverson"), Mention("ORG", 2, 3, "Meta"), Mention("LOC", 4, 6, "San Francisco")]
@@ -107,7 +102,6 @@ class TestMerge(unittest.TestCase):
         self.assertEqual(3, scores.true_positives)
         self.assertEqual(1, scores.false_positives)
         self.assertEqual(3, scores.false_negatives)
-
         self.assertAlmostEqual(0.6, scores.f1_score())
 
     def test_merge_partial_match(self) -> None:
