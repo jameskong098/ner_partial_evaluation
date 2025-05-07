@@ -17,6 +17,7 @@ It may not make sense to award full credit for partial matches, because it incen
 * A partial match clearly refers to the same entity
 * A partial match can refer to a more general entity which contains the annotated entity, as long as that connection is obvious. (Ex. Philips AVENT is annotated as an ORG, and is contained by the prediction Philips ORG)
 * Partial match does not include extra context which significantly changes its meaning
+* Partial match captures one of multiple entities in a mention (this rule exists because some gold mentions clearly refer to multiple different entities by username, and our model typically predicted each username as a separate mention). This is something to change in the dataset for future work, but we thought it appropriate to give credit for capturing one of the entities in the mention.
 
 ## Examples
 | Quality | Gold             | Prediction         |
