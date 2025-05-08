@@ -186,3 +186,6 @@ resources/
 hw2_utils.py
 hw2.py
 tmp.model
+
+.vscode/
+ner_partial_evaluation/.vscode

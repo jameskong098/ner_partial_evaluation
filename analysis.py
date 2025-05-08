@@ -218,12 +218,11 @@ if __name__ == "__main__":
     corpus = load_corpus()
 
     # extract the labels from the corpus
-    # TODO why is add_unk=True required?
     label_type = 'ner'
     label_dict = corpus.make_label_dictionary(label_type=label_type, add_unk=True)
 
     # load model from file
-    model_path = "models/best-model.pt"  
+    model_path = "models/best-model.pt" # make sure this path points to the model
     if not os.path.isfile(model_path):
         raise FileNotFoundError(f"Model file not found at {model_path}")
     model = SequenceTagger.load(model_path)
@@ -232,7 +231,7 @@ if __name__ == "__main__":
     predictions = predict(data_points=corpus.dev, model=model, batch_size=32)   
 
     # re-tagging the sentences means we lose the original dev tags
-    # for now just reload the corpus, relatively fast
+    # reload the corpus, relatively fast
     corpus = load_corpus()
     scores = scorer_evaluate(corpus.dev, predictions)
     scores.print_score_report()

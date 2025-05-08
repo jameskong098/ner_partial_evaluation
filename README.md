@@ -32,38 +32,38 @@ Or:
 -   Gold: "The New York Times"[ORG]
 -   Prediction: The "New York Times"[ORG]
 
-These predictions capture the correct entities but are penalized as errors under exact matching. We believe partial credit would better reflect model performance in many cases.
+These predictions capture the correct entities but are penalized as errors under exact matching. We believe partial credit metrics could be more sensitive to model improvement in some cases
 
 ## Project Overview
 
 This project explores evaluation metrics that award partial credit to NER predictions that are close but not exact matches to annotated data. 
 
-1.  Implement various exact and partial evaluation metrics (inspired by SemEval 2013 and other approaches) in `scorer.py`.
-2.  Train an NER model using FLAIR with CRF on the Broad Twitter Corpus (`train.py`, `train.ipynb`).
-3.  Evaluate model outputs using the different metrics implemented in `scorer.py` via `analysis.py`.
-4.  Generate detailed reports of partial matches (`predictions/`) and visualizations (`charts/`).
-5.  Analyze the quality of partial matches based on defined guidelines ([`guidelines.md`](guidelines.md), [`predictions/README.md`](predictions/README.md)).
-6.  Compare partial metrics against baseline exact-match F1.
+1.  Implemented exact and partial evaluation metrics (inspired by SemEval 2013 and other approaches) in `scorer.py`.
+2.  Trained BiLSTM-CRF model using FLAIR on the Broad Twitter Corpus.
+3.  Evaluated model outputs using the different metrics implemented in `scorer.py` via `analysis.py`.
+4.  Generated detailed reports of partial matches (`predictions/`) and visualizations (`charts/`).
+5.  Analyzed the quality of partial matches based on defined guidelines ([`guidelines.md`](guidelines.md), [`predictions/README.md`](predictions/README.md)).
+6.  Compared partial metrics against baseline exact-match F1.
 
 ## Dataset
 
-We use the [Broad Twitter Corpus](https://aclanthology.org/C16-1111.pdf), a dataset known for annotation challenges that make exact matching difficult.
+We use the [Broad Twitter Corpus](https://aclanthology.org/C16-1111.pdf) so that we can study partial matches on noisy data.
 
-**Preprocessing:** The original dataset contains inconsistencies where mentions starting with "@" followed immediately by the rest of the entity (e.g., "@" [B-PER], "username" [B-PER]) are tagged as separate entities. The script `broad_twitter_corpus/dataset_correction.py` corrects this by merging such cases into single entities (e.g., "@" [B-PER], "username" [I-PER]) before training and evaluation. The corrected files (`train.txt`, `dev.txt`, `test.txt`) are used by the project.
+**Preprocessing:** The original dataset contains instances where mentions starting with "@" followed immediately by the rest of the entity (e.g., "@" [B-PER], "username" [B-PER]) are tagged as separate entities. The script `broad_twitter_corpus/dataset_correction.py` corrects this by merging such cases into single entities (e.g., "@" [B-PER], "username" [I-PER]) before training and evaluation. The corrected files (`train.txt`, `dev.txt`, `test.txt`) are used by the project.
 
 ## Methodology
 
 ### Model Implementation (`train.py`)
 -   Uses the [FLAIR](https://github.com/flairNLP/flair) library.
 -   Employs a `SequenceTagger` model.
--   Utilizes stacked embeddings (e.g., `WordEmbeddings('twitter')`, `FlairEmbeddings`).
--   Incorporates a Conditional Random Field (CRF) layer (`use_crf=True`) to improve tag sequence validity.
+-   Utilizes stacked embeddings (`WordEmbeddings('twitter')`, `FlairEmbeddings`).
+-   Incorporates a Conditional Random Field (CRF) layer to improve tag sequence validity.
 -   Training is performed using `ModelTrainer`.
+-   [Model is available here](https://drive.google.com/drive/folders/1QQb_S4BYiYj-8PnHnyQrBSHp8IH7zVIO?usp=sharing)
 
 ### Evaluation (`analysis.py`, `scorer.py`)
--   The `analysis.py` script loads the trained model and the test/dev portions of the corpus.
--   It generates predictions on the dataset.
--   The `scorer.py` module calculates scores for all implemented metrics (Exact, Exact Boundary, Left, Right, Partial Overlap) by comparing predictions against gold standard annotations.
+-   The `analysis.py` script loads the trained model and evaluates it on the dev and test splits.
+-   The `scorer.py` module calculates scores for all implemented metrics (Exact, Left, Right, Partial Overlap) by comparing predictions against gold standard annotations.
 -   Detailed CSV files listing the specific gold/prediction pairs that received partial credit (0.5) or full credit (1.0) for overlap, left, and right boundary strategies are saved in the `predictions/` directory. See `predictions/README.md` for an analysis of these matches.
 -   Summary visualizations comparing the performance across different metrics are generated and saved in the `charts/` directory.
 
@@ -76,8 +76,6 @@ The following charts summarize the performance of the trained model for the `dev
 
 **Distribution of Exact vs. Partial Credits for Partial Matching Strategies:**
 ![Partial Match Credit Distribution Chart](test_charts/test_partial_match_credit_distribution.png)
-
-*(Note: Charts reflect results from a specific run and may change if the model or data is updated.)*
 
 ## Dependencies
 
@@ -95,9 +93,6 @@ You can install the required dependencies using pip:
 pip install -r requirements.txt
 ```
 
-**GPU Acceleration (Optional):**
-`nvidia-*` packages are related to using a CUDA-enabled GPU for faster model training and inference with PyTorch/Flair. They are not strictly required to run the code on a CPU. If you intend to use a GPU, ensure you have the correct NVIDIA drivers and CUDA toolkit installed, and follow the installation instructions for PyTorch ([https://pytorch.org/](https://pytorch.org/)) and Flair for your specific setup. Installing the GPU-compatible version of `torch` usually handles the necessary `nvidia-*` dependencies.
-
 ## How to Run
 
 1.  **Prepare Data:** Ensure the corrected Broad Twitter Corpus files (`train.txt`, `dev.txt`, `test.txt`) are present in the `broad_twitter_corpus/` directory. You can generate these using `python broad_twitter_corpus/dataset_correction.py`.
@@ -107,8 +102,8 @@ pip install -r requirements.txt
     source venv/bin/activate  
     pip install -r requirements.txt
     ```
-3.  **Train Model:** Run the training script: `python train.py`. This will save the best model (e.g., `resources/taggers/sota-ner-flair/best-model.pt`). *Alternatively, use the `train.ipynb` notebook.*
-4.  **Run Analysis:** Execute the analysis script, ensuring the model path in `analysis.py` points to your trained model: `python analysis.py`. This will print scores to the console, generate CSV files in `predictions/`, and save charts in `charts/`.
+3.  **Train Model:** Train the model in Colab using `train.ipynb`.
+4.  **Run Analysis:** Execute the analysis script, ensuring the model path in `analysis.py` points to your trained model: `python analysis.py`. This will print scores on to the console, generate CSV files in `predictions/`, and save charts in `charts/` - for both the dev and test sets of the BTC.
 
 ## References
 
