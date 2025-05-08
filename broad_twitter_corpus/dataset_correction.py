@@ -1,6 +1,7 @@
 # When an @ token appears labeled with B-X where the following token is B-X, they should be counted
 # as one entity, not two. This is important for accurate evaluation, and is corrected with the following script
 
+# apply the script to files from the broad_twitter_corpus before training
 DELIM = "-"
 
 def correct_file(path: str, new_path: str) -> str:
@@ -35,9 +36,3 @@ def correct_file(path: str, new_path: str) -> str:
                     output.write("\n")
     
     return new_path
-
-
-if __name__ == "__main__":
-    correct_file("use_this.dev", "dev.txt")
-    correct_file("btc.train", "train.txt")
-    correct_file("btc.test", "test.txt")
