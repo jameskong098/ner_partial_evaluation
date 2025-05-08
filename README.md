@@ -2,6 +2,8 @@
 
 **Authors:** Charles Sullivan and James Kong
 
+[Link to ACL Paper](./Partial%20Evaluation%20Metrics%20in%20Named%20Entity%20Recognition%20-%20James%20Kong%20%20Charles%20Sullivan.pdf)
+
 ## Implemented Evaluation Metrics
 
 The following metrics are implemented in `scorer.py`:
